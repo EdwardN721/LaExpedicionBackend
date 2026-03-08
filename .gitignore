@@ -1,5 +1,14 @@
-.idea/*
+.idea/
 
+LaExpedicion.API/bin/*
+LaExpedicion.API/bin\\Debug/*
+LaExpedicion.API/obj/*
+LaExpedicion.API.API/bin/Debug/*
+LaExpedicion.Infrastructure/obj/*
+LaExpedicion.Infrastructure/bin/*
+LaExpedicion.Application/obj/*
+LaExpedicion.Application/bin/*
+LaExpedicion.Domain/obj/*
+LaExpedicion.Domain/bin/*
 
-
-LaExpedicion.API/appsetting.json
+LaExpedicion.API/appsettings.json

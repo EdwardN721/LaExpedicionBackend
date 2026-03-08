@@ -1,0 +1,32 @@
+using LaExpedicion.Application.DTOs.Peticion;
+using LaExpedicion.Application.DTOs.Respuesta;
+using LaExpedicion.Domain.Entities;
+
+namespace LaExpedicion.Application.Mappers;
+
+public static class ItemMapper
+{
+    public static Item MapToEntity(this CrearItemDto dto)
+    {
+        return new Item
+        {
+            Nombre = dto.Nombre,
+            Descripcion = dto.Descripcion ?? "Sin Descripción.",
+        };
+    }
+
+    public static ItemDto MapToDto(this Item item)
+    {
+        return new ItemDto
+        {
+            Nombre = item.Nombre,
+            Descripcion = item.Descripcion ?? "Sin Descripción.",
+        };
+    }
+
+    public static IEnumerable<ItemDto> MapToDto(this IEnumerable<Item>? items)
+    {
+        if (items == null) return Enumerable.Empty<ItemDto>();
+        return items.Select(MapToDto);
+    }
+}
