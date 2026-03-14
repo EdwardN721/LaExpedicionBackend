@@ -2,6 +2,7 @@ namespace LaExpedicion.Application.DTOs.Respuesta;
 
 public record PersonajeDto
 {
+    public Guid Id { get; init; }
     public string NombreUsuario { get; init; } = string.Empty;
     public string? Etiqueta { get; init; } = string.Empty;
     public int? Fuerza { get; init; }

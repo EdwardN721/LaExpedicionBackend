@@ -17,6 +17,14 @@ public static class ExpedicionMapper
         };
     }
 
+    public static void UpdateEntity(this Expedicion entity, ActualizarExpedicionDto dto)
+    {
+        entity.Nombre = dto.Nombre;
+        entity.Descripcion = dto.Descripcion;
+        entity.Dinero = dto.Dinero;
+        entity.Experiencia = dto.Experiencia;
+    }
+
     public static ExpedicionDto MapToDto(this Expedicion expedicion)
     {
         return new ExpedicionDto

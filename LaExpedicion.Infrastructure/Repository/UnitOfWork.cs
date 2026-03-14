@@ -12,9 +12,11 @@ public class UnitOfWork : IUnitOfWork
 
     private IGenericRepository<Personaje>? _personajes;
     private IGenericRepository<Item>? _items;
+    private IGenericRepository<Estadistica>? _estadisticas;
     private IGenericRepository<Inventario>? _inventarios;
     private IGenericRepository<Expedicion>? _expediciones;
     private IGenericRepository<ExpedicionRealizada>? _expedicionRealizadas;
+    private IGenericRepository<Etiqueta>? _etiquetas;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -27,6 +29,22 @@ public class UnitOfWork : IUnitOfWork
         {
             return _personajes ??= new GenericRepository<Personaje>(_context); 
         } 
+    }
+
+    public IGenericRepository<Estadistica> Estadisticas
+    {
+        get
+        {
+            return _estadisticas ??= new GenericRepository<Estadistica>(_context);
+        }
+    }
+
+    public IGenericRepository<Etiqueta> Etiquetas
+    {
+        get
+        {
+            return _etiquetas ??= new GenericRepository<Etiqueta>(_context);
+        }
     }
 
     public IGenericRepository<Item> Items

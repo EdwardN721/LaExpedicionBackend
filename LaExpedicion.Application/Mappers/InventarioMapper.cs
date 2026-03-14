@@ -17,6 +17,12 @@ public static class InventarioMapper
         };
     }
 
+    public static void UpdateEntity(this Inventario inventario, ActualizarInventarioDto dto)
+    {
+        inventario.UsosRestantes = dto.UsosRestantes;
+        inventario.Equipado = dto.Equipado;
+    } 
+
     public static InventarioDto MapToDto(this Inventario inventario)
     {
         return new InventarioDto

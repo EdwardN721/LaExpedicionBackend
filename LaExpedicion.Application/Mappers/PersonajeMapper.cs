@@ -16,10 +16,17 @@ public static class PersonajeMapper
         };
     }
 
+    public static void UpdateEntity(this Personaje personaje, ActualizarPersonajeDto dto)
+    {
+        personaje.NombreUsuario = dto.NombreUsuario;
+        personaje.EtiquetaId = dto.EtiquetaId;
+    }
+
     public static PersonajeDto MapToDto(this Personaje personaje)
     {
         return new PersonajeDto
         {
+            Id = personaje.Id,
             NombreUsuario = personaje.NombreUsuario,
             Etiqueta = personaje.Etiqueta?.Nombre ?? "N/A",
             Salud = personaje.Estadistica?.Salud ?? 0,

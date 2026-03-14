@@ -1,14 +1,13 @@
-using LaExpedicion.Domain.Enum;
+namespace LaExpedicion.Application.DTOs.Respuesta;
 
-namespace LaExpedicion.Application.DTOs.Peticion;
-
-public record CrearExpedicionRealizadaDto
+public record ExpedicionRealizadaDto
 {
+    public Guid Id { get; init; }
     public Guid PersonajeId { get; init; }
     public Guid ExpedicionId { get; init; }
     public DateTime FechaInicio { get; init; }
     public DateTime? FechaFin { get; init; }
-    public EnumResultado Resultado { get; init; }
+    public string Resultado { get; init; } = string.Empty;
     public int ExperienciaGanada { get; init; }
-    public double DineroGanado { get; init; }
+    public double DineroGanado { get; init; }  
 };

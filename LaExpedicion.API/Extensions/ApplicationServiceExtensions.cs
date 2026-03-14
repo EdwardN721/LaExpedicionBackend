@@ -1,4 +1,8 @@
 using System.Reflection;
+using FluentValidation;
+using LaExpedicion.Application.Interfaces;
+using LaExpedicion.Application.Services;
+using LaExpedicion.Application.Validations;
 using LaExpedicion.Domain.Entities;
 using LaExpedicion.Domain.Interfaces;
 using LaExpedicion.Infrastructure.Data;
@@ -31,6 +35,11 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IEtiquetaService, EtiquetaService>();
+        services.AddScoped<IEstadisticaService, EstadisticaService>();
+        services.AddScoped<IPersonajeService, PersonajeService>();
         
         return services;
     }
@@ -75,10 +84,6 @@ public static class ApplicationServiceExtensions
                 {
                     Name = "Eduardo",
                     Email = "soporte@mymail.com"
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "LicenciaProv"
                 }
             });
 
@@ -99,6 +104,13 @@ public static class ApplicationServiceExtensions
 
             // JWT Añadir
         });
+        
+        return services;
+    }
+
+    public static IServiceCollection AddValidationService(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssemblyContaining<UsuarioValidator>();
         
         return services;
     }

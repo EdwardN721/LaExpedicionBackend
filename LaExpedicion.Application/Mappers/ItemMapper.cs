@@ -15,6 +15,12 @@ public static class ItemMapper
         };
     }
 
+    public static void UpdateEntity(this Item entity, ActualizarItemDto dto)
+    {
+        entity.Nombre = dto.Nombre;
+        entity.Descripcion = dto.Descripcion;
+    }
+
     public static ItemDto MapToDto(this Item item)
     {
         return new ItemDto

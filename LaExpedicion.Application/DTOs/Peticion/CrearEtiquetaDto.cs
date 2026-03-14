@@ -2,6 +2,6 @@ namespace LaExpedicion.Application.DTOs.Peticion;
 
 public record CrearEtiquetaDto
 {
-    private string Nombre { get; init; } = string.Empty;
-    private string? Descripcion { get; init; } = string.Empty;
+    public string Nombre { get; init; } = string.Empty;
+    public string? Descripcion { get; init; } = string.Empty;
 };
