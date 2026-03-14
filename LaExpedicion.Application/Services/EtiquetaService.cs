@@ -33,6 +33,21 @@ public class EtiquetaService : IEtiquetaService
         return etiqueta.MapToDto();
     }
 
+    public async Task<Guid> ObtenerEtiquetaPorNombre(string nombre)
+    {
+        _logger.LogInformation("Buscando etiqueta: {Nombre}", nombre);
+        
+        Etiqueta? etiqueta = await _unitOfWork.Etiquetas.GetFirstOrDefaultAsync(e => e.Nombre == nombre);
+        
+        if (etiqueta == null)
+        {
+            _logger.LogWarning("La etiqueta {Nombre} no fue encontrada en la base de datos.", nombre);
+            throw new KeyNotFoundException($"No se encontró una etiqueta con el nombre '{nombre}'.");
+        }
+
+        return etiqueta.Id;
+    }
+
     public async Task<EtiquetaDto> CrearEtiqueta(CrearEtiquetaDto dto)
     {
         Etiqueta nuevaEtiqueta = dto.MapToEntity();

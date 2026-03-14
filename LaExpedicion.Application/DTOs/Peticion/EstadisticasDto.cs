@@ -1,8 +1,7 @@
 namespace LaExpedicion.Application.DTOs.Peticion;
 
-public record CrearEstadisticaDto
+public record EstadisticasDto
 {
-    public Guid PersonajeId { get; init; }
     public int Salud { get; init; }
     public int Fuerza { get; init; }
     public int Energia { get; init; }

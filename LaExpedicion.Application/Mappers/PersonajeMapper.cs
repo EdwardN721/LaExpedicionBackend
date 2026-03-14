@@ -11,7 +11,6 @@ public static class PersonajeMapper
         return new Personaje
         {
             NombreUsuario = dto.NombreUsuario,
-            EtiquetaId = dto.EtiquetaId,
             UsuarioId = dto.UsuarioId
         };
     }

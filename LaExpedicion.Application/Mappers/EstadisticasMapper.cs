@@ -6,17 +6,16 @@ namespace LaExpedicion.Application.Mappers;
 
 public static class EstadisticasMapper
 {
-    static Random _rnd = new Random();
     public static Estadistica MapToEntity(this CrearEstadisticaDto dto)
     {
         return new Estadistica
         {
             PersonajeId = dto.PersonajeId,
-            Salud = _rnd.Next(0, 10),
-            Fuerza = _rnd.Next(0, 10),
-            Energia = _rnd.Next(0, 10),
-            Magia = _rnd.Next(0, 10),
-            Mana = _rnd.Next(0, 10)
+            Salud = dto.Salud,
+            Fuerza = dto.Fuerza,
+            Energia = dto.Energia,
+            Magia = dto.Magia,
+            Mana = dto.Mana
         };
     }
 
