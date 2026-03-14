@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaExpedicion.Infrastructure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaExpedicion.Application", "LaExpedicion.Application\LaExpedicion.Application.csproj", "{764473F6-9EAF-4005-BF0B-7760B7613C29}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LaExpedicion.Shared", "LaExpedicion.Shared\LaExpedicion.Shared.csproj", "{8469546A-A5DD-4157-B2A1-D36268C1DD00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{764473F6-9EAF-4005-BF0B-7760B7613C29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{764473F6-9EAF-4005-BF0B-7760B7613C29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{764473F6-9EAF-4005-BF0B-7760B7613C29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8469546A-A5DD-4157-B2A1-D36268C1DD00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8469546A-A5DD-4157-B2A1-D36268C1DD00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8469546A-A5DD-4157-B2A1-D36268C1DD00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8469546A-A5DD-4157-B2A1-D36268C1DD00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -7,6 +7,7 @@ using LaExpedicion.Domain.Entities;
 using LaExpedicion.Domain.Enum;
 using LaExpedicion.Domain.Exceptions;
 using LaExpedicion.Domain.Interfaces;
+using LaExpedicion.Shared.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace LaExpedicion.Application.Services;
@@ -50,13 +51,13 @@ public class PersonajeService : IPersonajeService
           
           Guid etiquetaAsignada = Guid.Empty; 
           if (promedio <= 3)
-              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(GetEnumDescription(EnumEtiquetas.Novato));
+              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(EnumEtiquetas.Novato.GetEnumDescription());
           else if (promedio <= 6)
-              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(GetEnumDescription(EnumEtiquetas.Aventurero));
+              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(EnumEtiquetas.Aventurero.GetEnumDescription());
           else if  (promedio <= 9)
-              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(GetEnumDescription(EnumEtiquetas.TalentoNato));
+              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(EnumEtiquetas.TalentoNato.GetEnumDescription());
           else if (promedio == 10)
-              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(GetEnumDescription(EnumEtiquetas.Genio));
+              etiquetaAsignada = await _etiquetaService.ObtenerEtiquetaPorNombre(EnumEtiquetas.Genio.GetEnumDescription());
 
           nuevoPersonaje.EtiquetaId = etiquetaAsignada; // Pasamos etiqueta
           
@@ -145,12 +146,5 @@ public class PersonajeService : IPersonajeService
         },  avg);
     }
     
-    public static string GetEnumDescription(Enum value)
-    {
-        var field = value.GetType().GetField(value.ToString());
-        var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
-        return attribute == null ? value.ToString() : attribute.Description;
-    }
-
     #endregion
 }
