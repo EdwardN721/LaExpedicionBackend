@@ -99,6 +99,7 @@ public class PersonajeService : IPersonajeService
         personaje.UpdateEntity(dto);
         
         _unitOfWork.Personajes.Actualizar(personaje);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Actualizando personaje {NombreUsuario}", dto.NombreUsuario);
     }
 
@@ -107,6 +108,7 @@ public class PersonajeService : IPersonajeService
         Personaje personaje = await ObtenerPorId(id);
         
         _unitOfWork.Personajes.Eliminar(personaje);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogWarning("Personaje eliminado: {NombreUsuario}", personaje.UsuarioId);
     }
 

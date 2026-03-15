@@ -12,7 +12,7 @@ namespace LaExpedicion.Application.Services;
 public class EtiquetaService : IEtiquetaService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger _logger;
+    private readonly ILogger<EtiquetaService> _logger;
 
     public EtiquetaService(IUnitOfWork unitOfWork, ILogger<EtiquetaService> logger)
     {
@@ -61,6 +61,7 @@ public class EtiquetaService : IEtiquetaService
         Etiqueta etiqueta = await ObtenerPorId(id);
         etiqueta.UpdateEntity(dto);
         _unitOfWork.Etiquetas.Actualizar(etiqueta);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Etiqueta actualizada: {Nombre}", dto.Nombre);
     }
 
@@ -68,6 +69,7 @@ public class EtiquetaService : IEtiquetaService
     {
         Etiqueta etiqueta = await ObtenerPorId(id);
         _unitOfWork.Etiquetas.Eliminar(etiqueta);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogWarning("Etiqueta eliminada: {NombreEtiqueta}", etiqueta.Nombre);
     }
 

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/apolo/Escritorio/Programacion/LaExpedicion/LaExpedicion.Shared/LaExpedicion.Shared.csproj",
+      "projectUniqueName": "/home/apolo/Escritorio/Programacion/LaExpedicionBackend/LaExpedicion.Shared/LaExpedicion.Shared.csproj",
       "projectName": "LaExpedicion.Shared",
-      "projectPath": "/home/apolo/Escritorio/Programacion/LaExpedicion/LaExpedicion.Shared/LaExpedicion.Shared.csproj",
+      "projectPath": "/home/apolo/Escritorio/Programacion/LaExpedicionBackend/LaExpedicion.Shared/LaExpedicion.Shared.csproj",
       "packagesPath": "/home/apolo/.nuget/packages/",
-      "outputPath": "/home/apolo/Escritorio/Programacion/LaExpedicion/LaExpedicion.Shared/obj/",
+      "outputPath": "/home/apolo/Escritorio/Programacion/LaExpedicionBackend/LaExpedicion.Shared/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/apolo/.nuget/NuGet/NuGet.Config"

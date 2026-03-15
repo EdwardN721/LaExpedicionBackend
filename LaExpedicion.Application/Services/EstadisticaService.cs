@@ -46,6 +46,7 @@ public class EstadisticaService : IEstadisticaService
         Estadistica estadistica = await ObtenerPorId(id);
         estadistica.UpdateEntity(dto);
         _unitOfWork.Estadisticas.Actualizar(estadistica);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Estadistica actualizada: {Id}", estadistica.Id);
     }
 
@@ -53,6 +54,7 @@ public class EstadisticaService : IEstadisticaService
     {
         Estadistica estadistica = await ObtenerPorId(id);
         _unitOfWork.Estadisticas.Eliminar(estadistica);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogWarning("Estadistica eliminada: {Id}", estadistica.Id);
     }
 
