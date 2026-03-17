@@ -14,6 +14,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
+        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
     </ItemGroup>
 
@@ -21,6 +22,10 @@
       <ProjectReference Include="..\LaExpedicion.Application\LaExpedicion.Application.csproj" />
       <ProjectReference Include="..\LaExpedicion.Domain\LaExpedicion.Domain.csproj" />
       <ProjectReference Include="..\LaExpedicion.Infrastructure\LaExpedicion.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Filter\" />
     </ItemGroup>
 
 </Project>

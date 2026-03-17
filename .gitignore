@@ -10,5 +10,7 @@ LaExpedicion.Application/obj/*
 LaExpedicion.Application/bin/*
 LaExpedicion.Domain/obj/*
 LaExpedicion.Domain/bin/*
+LaExpedicion.Shared/obj/*
+LaExpedicion.Shared/bin/*
 
 LaExpedicion.API/appsettings.json

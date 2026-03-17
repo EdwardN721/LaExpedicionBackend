@@ -1,13 +1,15 @@
-using System.ComponentModel;
+using System.Linq.Expressions;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Mappers;
+using LaExpedicion.Application.Parameters;
 using LaExpedicion.Domain.Entities;
 using LaExpedicion.Domain.Enum;
 using LaExpedicion.Domain.Exceptions;
 using LaExpedicion.Domain.Interfaces;
 using LaExpedicion.Shared.Extensions;
+using LaExpedicion.Shared.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace LaExpedicion.Application.Services;
@@ -25,11 +27,24 @@ public class PersonajeService : IPersonajeService
         _etiquetaService = etiquetaService ?? throw new ArgumentNullException(nameof(etiquetaService));
     }
 
-    public async Task<IEnumerable<PersonajeDto>> ObtenerTodosPersonajes()
+    public async Task<PagedList<PersonajeDto>> ObtenerTodosPersonajes(ItemParameters parameters)
     {
-        List<Personaje> personajes = (await _unitOfWork.Personajes.ObtenerTodosAsync()).ToList();
-        _logger.LogInformation("Obtener Personajes con Total: {Cantidad}", personajes.Count);
-        return personajes.MapToDto();
+        Expression<Func<Personaje, bool>>? filter = null;
+
+        if (!string.IsNullOrWhiteSpace(parameters.Nombre))
+        {
+            filter = x => x.NombreUsuario.Contains(parameters.Nombre);
+        }
+        
+        var (registros, total) = await _unitOfWork.Personajes.ObtenerPaginadosAsync(
+            filter,
+            parameters.PageNumber,
+            parameters.PageSize);
+        
+        List<PersonajeDto> personajes = registros.Select(personaje => personaje.MapToDto()).ToList();
+        
+        _logger.LogInformation("Total de registros: {PersonajesCount}", personajes.Count);
+        return new PagedList<PersonajeDto>(personajes, total, parameters.PageNumber, parameters.PageSize);
     }
 
     public async Task<PersonajeDto> ObtenerPersonajePorId(Guid id)

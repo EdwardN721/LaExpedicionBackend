@@ -1,6 +1,9 @@
+using System.Text.Json;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
+using LaExpedicion.Application.Parameters;
+using LaExpedicion.Shared.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LaExpedicion.API.Controllers;
@@ -26,10 +29,16 @@ public class EstadisticaController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<EstadisticaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ObtenerTodasEstadisticas()
+    public async Task<IActionResult> ObtenerTodasEstadisticas([FromQuery] ItemParameters itemParameters)
     {
-        IEnumerable<EstadisticaDto> estadisticas = await _estadisticaService.ObtenerEstadisticas();
-        return Ok(estadisticas);
+        PagedList<EstadisticaDto> pagedResult = await _estadisticaService.ObtenerEstadisticas(itemParameters);
+        
+        var metadataJson = JsonSerializer.Serialize(pagedResult.Metadata);
+        
+        Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
+        Response.Headers.Append("X-Pagination", metadataJson);
+        
+        return Ok(pagedResult);
     }
     
     /// <summary>

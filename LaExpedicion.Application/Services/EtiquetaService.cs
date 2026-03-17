@@ -1,10 +1,13 @@
+using System.Linq.Expressions;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Mappers;
+using LaExpedicion.Application.Parameters;
 using LaExpedicion.Domain.Entities;
 using LaExpedicion.Domain.Exceptions;
 using LaExpedicion.Domain.Interfaces;
+using LaExpedicion.Shared.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace LaExpedicion.Application.Services;
@@ -20,11 +23,21 @@ public class EtiquetaService : IEtiquetaService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<IEnumerable<EtiquetaDto>> ObtenerEtiquetas()
+    public async Task<PagedList<EtiquetaDto>> ObtenerEtiquetas(ItemParameters itemParameters)
     {
-        List<Etiqueta> etiquetas = (await _unitOfWork.Etiquetas.ObtenerTodosAsync()).ToList();
-        _logger.LogInformation("ObtenerEtiquetas: {Cantidad}", etiquetas.Count);
-        return etiquetas.MapToDto();
+        Expression<Func<Etiqueta, bool>> filter = x => true;
+
+        if (!string.IsNullOrWhiteSpace(itemParameters.Nombre))
+        {
+            filter = x => x.Nombre.Contains(itemParameters.Nombre);
+        }
+        
+        var (registros, total) = await _unitOfWork.Etiquetas.ObtenerPaginadosAsync(filter, itemParameters.PageNumber, itemParameters.PageSize);
+        
+        List<EtiquetaDto> etiquetas = registros.Select(item => item.MapToDto()).ToList();
+        
+        return new PagedList<EtiquetaDto>(
+            etiquetas, total, itemParameters.PageNumber, itemParameters.PageSize);
     }
 
     public async Task<EtiquetaDto> ObtenerEtiquetaPorId(Guid id)

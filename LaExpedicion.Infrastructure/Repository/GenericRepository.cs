@@ -33,6 +33,25 @@ public class GenericRepository<T> : IGenericRepository<T> where T
         return await _dbSet.AsNoTracking().Where(predicate).ToListAsync(); 
     }
 
+    public async Task<(IEnumerable<T> Registros, int Total)> ObtenerPaginadosAsync(Expression<Func<T, bool>>? filtro, int pageNumber, int pageSize)
+    {
+        IQueryable<T> query = _dbSet.AsNoTracking();
+
+        if (filtro != null)
+        {
+            query = query.Where(filtro);
+        }
+        
+        int total = await query.CountAsync();
+        
+        var registros = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        
+        return (registros, total);
+    }
+
     public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
     {
         return await _dbSet.FirstOrDefaultAsync(predicate); 

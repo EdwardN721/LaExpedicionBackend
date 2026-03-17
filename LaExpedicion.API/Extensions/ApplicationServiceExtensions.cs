@@ -11,6 +11,7 @@ using LaExpedicion.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace LaExpedicion.API.Extensions;
 
@@ -40,6 +41,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IEtiquetaService, EtiquetaService>();
         services.AddScoped<IEstadisticaService, EstadisticaService>();
         services.AddScoped<IPersonajeService, PersonajeService>();
+        services.AddScoped<IItemService, ItemService>();
         
         return services;
     }
@@ -111,6 +113,8 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddValidationService(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining<UsuarioValidator>();
+
+        services.AddFluentValidationAutoValidation();
         
         return services;
     }

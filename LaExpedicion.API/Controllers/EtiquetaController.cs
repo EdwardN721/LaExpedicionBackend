@@ -1,7 +1,10 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
+using LaExpedicion.Application.Parameters;
+using LaExpedicion.Shared.Pagination;
 
 namespace LaExpedicion.API.Controllers;
 
@@ -25,10 +28,17 @@ public class EtiquetaController : ControllerBase
     /// <returns>Lista de etiquetas</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<EtiquetaDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> ObtenerEtiquetas()
+    public async Task<ActionResult> ObtenerEtiquetas([FromQuery] ItemParameters parameters)
     {
-        IEnumerable<EtiquetaDto> etiquetas = await _service.ObtenerEtiquetas();
-        return Ok(etiquetas);
+        PagedList<EtiquetaDto> pagedResult = await _service.ObtenerEtiquetas(parameters);
+
+        string metadata = JsonSerializer.Serialize(pagedResult.Metadata);
+
+        Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
+        
+        Response.Headers.Append("X-Pagination", metadata);
+        
+        return Ok(pagedResult);
     }
     
     [HttpGet("{id:guid}")]

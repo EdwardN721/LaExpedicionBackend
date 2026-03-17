@@ -1,6 +1,9 @@
+using System.Text.Json;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
+using LaExpedicion.Application.Parameters;
+using LaExpedicion.Shared.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LaExpedicion.API.Controllers;
@@ -27,10 +30,17 @@ public class PersonajeController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<PersonajeDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> ObtenerTodosPeronsajes()
+    public async Task<ActionResult> ObtenerTodosPeronsajes([FromQuery] ItemParameters parameters)
     {
-        IEnumerable<PersonajeDto> personajes = await _service.ObtenerTodosPersonajes();
-        return Ok(personajes);
+        PagedList<PersonajeDto> pagedResult = await _service.ObtenerTodosPersonajes(parameters);
+        
+        string metadata = JsonSerializer.Serialize(pagedResult.Metadata);
+        
+        Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
+        
+        Response.Headers.Append("X-Pagination", metadata);
+        
+        return Ok(pagedResult);
     }
 
     /// <summary>

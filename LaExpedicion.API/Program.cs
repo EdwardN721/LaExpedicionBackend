@@ -1,4 +1,5 @@
 using LaExpedicion.API.Extensions;
+using LaExpedicion.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers(); // <-- enrute el tráfico hacia los controladores
 app.UseHttpsRedirection();

@@ -1,10 +1,13 @@
+using System.Linq.Expressions;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Mappers;
+using LaExpedicion.Application.Parameters;
 using LaExpedicion.Domain.Entities;
 using LaExpedicion.Domain.Exceptions;
 using LaExpedicion.Domain.Interfaces;
+using LaExpedicion.Shared.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace LaExpedicion.Application.Services;
@@ -20,11 +23,15 @@ public class EstadisticaService : IEstadisticaService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<IEnumerable<EstadisticaDto>> ObtenerEstadisticas()
+    public async Task<PagedList<EstadisticaDto>> ObtenerEstadisticas(ItemParameters itemParameters)
     {
-        List<Estadistica> estadisticas = (await _unitOfWork.Estadisticas.ObtenerTodosAsync()).ToList();
-        _logger.LogInformation("EstadisticasTotales: {Contador}", estadisticas.Count);
-        return estadisticas.MapToDto();
+        Expression<Func<Estadistica, bool>>? filter = null;
+
+        var (registros, total) = await _unitOfWork.Estadisticas.ObtenerPaginadosAsync(filter, itemParameters.PageNumber, itemParameters.PageSize);
+        List<EstadisticaDto> items = registros.Select(item => item.MapToDto()).ToList();
+        
+        return new PagedList<EstadisticaDto>(
+            items, total, itemParameters.PageNumber, itemParameters.PageSize);
     }
 
     public async Task<EstadisticaDto> ObtenerEstadisticasPersonaje(Guid idPersonaje)
