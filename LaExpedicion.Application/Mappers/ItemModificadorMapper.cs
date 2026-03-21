@@ -10,7 +10,6 @@ public static class ItemModificadorMapper
     {
         return new ItemModificador
         {
-            ItemId = dto.ItemId,
             EstadisticaAfectada = dto.EstadisticaAfectada,
             ValorAjuste = dto.ValorAjustado
         };

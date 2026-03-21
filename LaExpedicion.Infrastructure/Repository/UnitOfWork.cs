@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
 
     private IGenericRepository<Personaje>? _personajes;
     private IGenericRepository<Item>? _items;
+    private IGenericRepository<ItemModificador>? _itemModificadores;
     private IGenericRepository<Estadistica>? _estadisticas;
     private IGenericRepository<Inventario>? _inventarios;
     private IGenericRepository<Expedicion>? _expediciones;
@@ -52,6 +53,14 @@ public class UnitOfWork : IUnitOfWork
         get
         {
             return _items ??= new GenericRepository<Item>(_context);
+        }
+    }
+
+    public IGenericRepository<ItemModificador> ItemModificadores
+    {
+        get
+        {
+            return _itemModificadores ??= new GenericRepository<ItemModificador>(_context);
         }
     }
 

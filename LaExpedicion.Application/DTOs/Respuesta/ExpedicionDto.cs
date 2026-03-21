@@ -2,6 +2,7 @@ namespace LaExpedicion.Application.DTOs.Respuesta;
 
 public record ExpedicionDto
 {
+    public Guid Id { get; init; }
     public string Nombre { get; init; } = string.Empty;
     public string? Descripcion { get; init; } = string.Empty;
     public int Experiencia { get; init; }
@@ -10,6 +11,7 @@ public record ExpedicionDto
 
 public record ExpedicionRealziadaDto
 {
+    public Guid Id { get; init; }
     public string Nombre { get; init; } = string.Empty;
     public string? Descripcion { get; init; } = string.Empty;
     public string? NombrePersonaje { get; init; } = string.Empty;

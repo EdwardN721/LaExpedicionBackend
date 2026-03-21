@@ -29,6 +29,7 @@ public static class ExpedicionMapper
     {
         return new ExpedicionDto
         {
+            Id = expedicion.Id,
             Nombre = expedicion.Nombre,
             Descripcion = expedicion.Descripcion,
             Dinero = expedicion.Dinero,

@@ -20,7 +20,7 @@ public class ItemService : IItemService
     public ItemService(IUnitOfWork unitOfWork, ILogger<ItemService> logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        _logger = logger ??  throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<PagedList<ItemDto>> ObtenerTodosItems(ItemParameters itemParameters)
@@ -32,14 +32,14 @@ public class ItemService : IItemService
             // Entity framework lo traducirá a un LIKE '%nombre%' en SQL
             filter = x => x.Nombre.Contains(itemParameters.Nombre);
         }
-        
+
         var (registros, total) = await _unitOfWork.Items.ObtenerPaginadosAsync(
             filter,
             itemParameters.PageNumber,
             itemParameters.PageSize);
-        
+
         List<ItemDto> items = registros.Select(item => item.MapToDto()).ToList();
-        
+
         return new PagedList<ItemDto>(
             items, total, itemParameters.PageNumber, itemParameters.PageSize);
     }
@@ -54,21 +54,45 @@ public class ItemService : IItemService
     public async Task<ItemDto> CrearItem(CrearItemDto item)
     {
         _logger.LogInformation("Creando nuevo item: {NombreItem}", item.Nombre);
-        Item nuevoItem = item.MapToEntity();
-        
-        await _unitOfWork.Items.AgregarAsync(nuevoItem);
-        await _unitOfWork.SaveChangesAsync();
-        
-        _logger.LogInformation("Item creado exitosamente con Id: {Id}", nuevoItem.Id);
-        return nuevoItem.MapToDto();
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            Item nuevoItem = item.MapToEntity();
+            await _unitOfWork.Items.AgregarAsync(nuevoItem);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (item.Modificadores != null && item.Modificadores.Any())
+            {
+                foreach (var modificador in item.Modificadores)
+                {
+                    ItemModificador nuevaModificacion = modificador.MapToEntity();
+                    nuevaModificacion.ItemId = nuevoItem.Id;
+
+                    await _unitOfWork.ItemModificadores.AgregarAsync(nuevaModificacion);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            await _unitOfWork.CommitTransactionAsync();
+            _logger.LogInformation("Item y sus modificadores creados exitosamente con Id: {Id}", nuevoItem.Id);
+
+            return nuevoItem.MapToDto();
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            _logger.LogError(ex, "Error al crear el Item y sus modificadores");
+            throw;
+        }
     }
 
     public async Task ModificarItem(Guid id, ActualizarItemDto itemDto)
     {
         Item item = await ObtenerPorId(id);
-        
+
         item.UpdateEntity(itemDto);
-        
+
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Item modificado correctamente con Id: {Id}", id);
     }
@@ -76,7 +100,7 @@ public class ItemService : IItemService
     public async Task EliminarItem(Guid id)
     {
         Item item = await ObtenerPorId(id);
-        
+
         _unitOfWork.Items.Eliminar(item);
         await _unitOfWork.SaveChangesAsync();
         _logger.LogWarning("Item eliminado correctamente con Id: {Id}", id);
@@ -93,7 +117,7 @@ public class ItemService : IItemService
             _logger.LogWarning("No existe el item con Id: {Id}", id);
             throw new NotFoundException($"No existe el item con Id: {id}");
         }
-        
+
         return item;
     }
 

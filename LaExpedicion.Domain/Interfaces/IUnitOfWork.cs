@@ -7,6 +7,7 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Personaje> Personajes { get; }
     IGenericRepository<Etiqueta> Etiquetas { get; }
     IGenericRepository<Item> Items { get; }
+    IGenericRepository<ItemModificador> ItemModificadores { get; }
     IGenericRepository<Estadistica> Estadisticas { get; }
     IGenericRepository<Inventario> Inventarios { get; }
     IGenericRepository<Expedicion> Expediciones { get; }

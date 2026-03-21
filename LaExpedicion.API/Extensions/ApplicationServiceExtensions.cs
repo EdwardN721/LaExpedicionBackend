@@ -37,11 +37,13 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddScoped<IUsuarioService, UsuarioService>();
-        services.AddScoped<IEtiquetaService, EtiquetaService>();
         services.AddScoped<IEstadisticaService, EstadisticaService>();
-        services.AddScoped<IPersonajeService, PersonajeService>();
+        services.AddScoped<IEtiquetaService, EtiquetaService>();
+        services.AddScoped<IExpedicionService, ExpedicionService>();
+        services.AddScoped<IInventarioService, InventarioService>();
         services.AddScoped<IItemService, ItemService>();
+        services.AddScoped<IPersonajeService, PersonajeService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
         
         return services;
     }

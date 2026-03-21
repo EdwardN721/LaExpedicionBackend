@@ -25,6 +25,7 @@ public static class ItemMapper
     {
         return new ItemDto
         {
+            Id = item.Id,
             Nombre = item.Nombre,
             Descripcion = item.Descripcion ?? "Sin Descripción.",
         };

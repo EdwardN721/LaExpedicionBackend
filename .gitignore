@@ -12,5 +12,6 @@ LaExpedicion.Domain/obj/*
 LaExpedicion.Domain/bin/*
 LaExpedicion.Shared/obj/*
 LaExpedicion.Shared/bin/*
+LaExpedicion.Shared/bin\\Debug/*
 
 LaExpedicion.API/appsettings.json
