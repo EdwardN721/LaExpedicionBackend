@@ -39,7 +39,10 @@ public class PersonajeService : IPersonajeService
         var (registros, total) = await _unitOfWork.Personajes.ObtenerPaginadosAsync(
             filter,
             parameters.PageNumber,
-            parameters.PageSize);
+            parameters.PageSize,
+            x => x.Etiqueta!,
+            x => x.Estadistica!
+            );
         
         List<PersonajeDto> personajes = registros.Select(personaje => personaje.MapToDto()).ToList();
         
@@ -92,9 +95,12 @@ public class PersonajeService : IPersonajeService
           }; // Objeto para setterar estadisticas
           
           Estadistica nuevasEstadisticas = crearEstadisticaDto.MapToEntity();
-          
           await _unitOfWork.Estadisticas.AgregarAsync(nuevasEstadisticas);
+          await  _unitOfWork.SaveChangesAsync();
 
+          nuevoPersonaje.Estadistica = nuevasEstadisticas;
+          nuevoPersonaje.Etiqueta = await _unitOfWork.Etiquetas.GetFirstOrDefaultAsync(x => x.Id == etiquetaAsignada);
+          
           await _unitOfWork.SaveChangesAsync();
           await _unitOfWork.CommitTransactionAsync();
           
@@ -131,8 +137,12 @@ public class PersonajeService : IPersonajeService
 
     private async Task<Personaje> ObtenerPorId(Guid id)
     {
-        Personaje? personaje = await _unitOfWork.Personajes.ObtenerPorIdAsync(id);
-
+        Personaje? personaje = await _unitOfWork.Personajes.GetFirstOrDefaultAsync(
+            p => p.Id == id,
+            p => p.Etiqueta!, // Join
+            p => p.Estadistica! // Join
+        );
+        
         if (personaje == null)
         {
             _logger.LogWarning("No existe personaje con id: {Id}", id);

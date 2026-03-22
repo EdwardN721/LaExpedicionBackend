@@ -1,5 +1,6 @@
 using LaExpedicion.API.Extensions;
 using LaExpedicion.API.Middleware;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +21,9 @@ builder.Services.AddServices();
 // Cors
 builder.Services.AddCorsExtension(builder.Configuration);
 
-// Swagger
-builder.Services.AddSwaggerExtension();
+// OpenApi
+builder.Services.AddNativeOpenApi();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Activa el motor de Autorización en la memoria RAM
 builder.Services.AddAuthorization();
@@ -34,9 +36,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Genera el archivo openapi.json de forma nativa en /openapi/v1.json
     app.MapOpenApi();
-    app.UseSwagger(); // <-- Genera el JSON de Swagger
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LaExpedicion API v1")); // <-- Levanta la interfaz gráfica
+    
+    // Mapea la nueva interfaz gráfica (Scalar) en la ruta /scalar/v1
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("La Expedición RPG - API")
+            .WithTheme(ScalarTheme.DeepSpace)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 
 app.UseCors("AllowFrontend");

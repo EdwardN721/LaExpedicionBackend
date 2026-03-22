@@ -1,5 +1,6 @@
-using System.Reflection;
+using System.Text;
 using FluentValidation;
+using LaExpedicion.API.OpenApi;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Services;
 using LaExpedicion.Application.Validations;
@@ -8,9 +9,10 @@ using LaExpedicion.Domain.Interfaces;
 using LaExpedicion.Infrastructure.Data;
 using LaExpedicion.Infrastructure.Interceptors;
 using LaExpedicion.Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace LaExpedicion.API.Extensions;
@@ -36,6 +38,7 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ITokenService, TokenService>();
 
         services.AddScoped<IEstadisticaService, EstadisticaService>();
         services.AddScoped<IEtiquetaService, EtiquetaService>();
@@ -77,40 +80,34 @@ public static class ApplicationServiceExtensions
         return services;
     }
 
-    public static IServiceCollection AddSwaggerExtension(this IServiceCollection services)
+    public static IServiceCollection AddNativeOpenApi(this IServiceCollection services)
     {
-        services.AddSwaggerGen(c =>
+        services.AddOpenApi(options =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "LaExpedicion API",
-                Version = "v1",
-                Description = "API que controla el aplicativo RPG de la expedicion",
-                Contact = new OpenApiContact
-                {
-                    Name = "Eduardo",
-                    Email = "soporte@mymail.com"
-                }
-            });
-
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            if (File.Exists(xmlPath))
-            {
-                c.IncludeXmlComments(xmlPath);
-            }
-
-            // Opcional: soporte para múltiples versiones
-            c.SwaggerDoc("v2", new OpenApiInfo
-            {
-                Title = "API de Ejemplo",
-                Version = "v2",
-                Description = "Segunda versión de la API con mejoras"
-            });
-
-            // JWT Añadir
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
         
+        return services;
+    }
+
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+                    ValidateIssuer = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = configuration["Jwt:Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         return services;
     }
 

@@ -36,7 +36,9 @@ public class ItemService : IItemService
         var (registros, total) = await _unitOfWork.Items.ObtenerPaginadosAsync(
             filter,
             itemParameters.PageNumber,
-            itemParameters.PageSize);
+            itemParameters.PageSize,
+            x => x.ItemModificador
+        );
 
         List<ItemDto> items = registros.Select(item => item.MapToDto()).ToList();
 
@@ -61,6 +63,9 @@ public class ItemService : IItemService
             await _unitOfWork.Items.AgregarAsync(nuevoItem);
             await _unitOfWork.SaveChangesAsync();
 
+            // Creamos una lista temporal para guardar los modificadores y asignarlos a la memoria RAM
+            var modificadoresEnMemoria = new List<ItemModificador>();
+            
             if (item.Modificadores != null && item.Modificadores.Any())
             {
                 foreach (var modificador in item.Modificadores)
@@ -69,9 +74,12 @@ public class ItemService : IItemService
                     nuevaModificacion.ItemId = nuevoItem.Id;
 
                     await _unitOfWork.ItemModificadores.AgregarAsync(nuevaModificacion);
+                    modificadoresEnMemoria.Add(nuevaModificacion); 
                 }
 
                 await _unitOfWork.SaveChangesAsync();
+                
+                nuevoItem.ItemModificador = modificadoresEnMemoria;
             }
 
             await _unitOfWork.CommitTransactionAsync();
@@ -110,7 +118,10 @@ public class ItemService : IItemService
 
     private async Task<Item> ObtenerPorId(Guid id)
     {
-        Item? item = await _unitOfWork.Items.ObtenerPorIdAsync(id);
+        Item? item = await _unitOfWork.Items.GetFirstOrDefaultAsync(
+            i => i.Id == id,
+            i => i.ItemModificador // JOIN
+        );
 
         if (item == null)
         {

@@ -87,6 +87,26 @@ public class UsuarioService : IUsuarioService
         _logger.LogWarning("Usuario eliminado correctamente: {UsuarioNombre}", usuario.Nombre);
     }
 
+    public async Task<Usuario?> Login(LoginDto dto)
+    {
+        Usuario? usuario = await _userManager.FindByEmailAsync(dto.Email);
+
+        if (usuario == null)
+        {
+            _logger.LogWarning("Usuario no encontrado: {Email}", dto.Email);
+            return null;
+        }
+        
+        bool resultado = await _userManager.CheckPasswordAsync(usuario, dto.Password);
+        if (!resultado)
+        {
+            _logger.LogWarning("Credenciales incorrectas.");
+            return null;
+        }
+
+        return usuario;
+    }
+
     #region MetodosPrivados
 
     private async Task<Usuario> UsuarioPorId(Guid id)
