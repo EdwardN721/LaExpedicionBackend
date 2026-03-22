@@ -28,7 +28,7 @@ public class ExpedicionController : ControllerBase
     /// <returns>Lista de expediciones</returns>
     [HttpGet]
     [ProducesResponseType(typeof(PagedList<ExpedicionDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> ObtenerTodas(ExpedicionParameters parameters)
+    public async Task<ActionResult> ObtenerTodas([FromQuery] ExpedicionParameters parameters)
     {
         PagedList<ExpedicionDto> pagedResult = await _service.ObtenerTodasExpediciones(parameters);
         

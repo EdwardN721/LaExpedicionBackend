@@ -144,12 +144,11 @@ public class PersonajeService : IPersonajeService
 
     private (EstadisticasDto, int promedio) GenerarEstadisticas()
     {
-        Random rnd = new Random();
-        int fuerza = rnd.Next(0, 11);
-        int energia = rnd.Next(0, 11);
-        int magia = rnd.Next(0, 11);
-        int mana = rnd.Next(0, 11);
-        int salud = rnd.Next(50, 100);
+        int fuerza = Random.Shared.Next(0, 11);
+        int energia = Random.Shared.Next(0, 11);
+        int magia = Random.Shared.Next(0, 11);
+        int mana = Random.Shared.Next(0, 11);
+        int salud = Random.Shared.Next(50, 100);
 
         int avg = (fuerza + energia + magia + mana) / 4;
         

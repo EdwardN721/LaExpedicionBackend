@@ -44,6 +44,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IPersonajeService, PersonajeService>();
         services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IExpedicionRealizadaService, ExpedicionRealizadaService>();
         
         return services;
     }
@@ -68,7 +69,8 @@ public static class ApplicationServiceExtensions
                 {
                     policy.WithOrigins(frontendUrl)
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .WithExposedHeaders("X-Pagination");
                 });
         });
 

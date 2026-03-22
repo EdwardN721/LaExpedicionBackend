@@ -65,6 +65,7 @@ public class EtiquetaService : IEtiquetaService
     {
         Etiqueta nuevaEtiqueta = dto.MapToEntity();
         await _unitOfWork.Etiquetas.AgregarAsync(nuevaEtiqueta);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Etiqueta creada: {Nombre}", dto.Nombre);
         return nuevaEtiqueta.MapToDto();
     }

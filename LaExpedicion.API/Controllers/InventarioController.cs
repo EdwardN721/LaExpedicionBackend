@@ -27,7 +27,7 @@ public class InventarioController : ControllerBase
     /// </summary>
     [HttpGet("personaje/{personajeId:guid}")]
     [ProducesResponseType(typeof(PagedList<InventarioDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> ObtenerInventario([FromRoute] Guid personajeId, [FromBody] InventarioParameters parameters)
+    public async Task<ActionResult> ObtenerInventario([FromRoute] Guid personajeId, [FromQuery] InventarioParameters parameters)
     {
         PagedList<InventarioDto> pagedResult = await _service.ObtenerInventarioDelPersonaje(personajeId, parameters);
 

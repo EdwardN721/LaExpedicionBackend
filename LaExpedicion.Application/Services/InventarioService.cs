@@ -23,26 +23,24 @@ public class InventarioService : IInventarioService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<PagedList<InventarioDto>> ObtenerInventarioDelPersonaje(Guid personajeId,
-        InventarioParameters parametros)
+    public async Task<PagedList<InventarioDto>> ObtenerInventarioDelPersonaje(Guid personajeId, InventarioParameters parametros)
     {
-        Expression<Func<Inventario, bool>>? filter = null;
-
+        // 1. Filtramos por el personaje obligatorio
+        Expression<Func<Inventario, bool>> filter = x => x.PersonajeId == personajeId;
+        
         if (!string.IsNullOrWhiteSpace(parametros.Nombre))
         {
-            filter = x => x.Item.Nombre.Contains(parametros.Nombre);
+            filter = x => x.PersonajeId == personajeId && x.Item!.Nombre.Contains(parametros.Nombre);
         }
 
-        if (!parametros.Equipado)
-        {
-            filter = x => x.Equipado == parametros.Equipado;
-        }
-
+        // 2. Le mandamos las tablas que queremos incluir
         var (registros, total) = await _unitOfWork.Inventarios.ObtenerPaginadosAsync(
             filter, 
             parametros.PageNumber,
-            parametros.PageSize
-            );
+            parametros.PageSize,
+            x => x.Item!,       // 👈 Entity Framework hará un INNER JOIN con Items
+            x => x.Personaje!   // 👈 Entity Framework hará un INNER JOIN con Personajes
+        );
         
         List<InventarioDto> inventarios = registros.Select(inventario => inventario.MapToDto()).ToList();
 

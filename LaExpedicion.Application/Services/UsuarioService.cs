@@ -5,6 +5,7 @@ using LaExpedicion.Application.Mappers;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
+using LaExpedicion.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace LaExpedicion.Application.Services;
@@ -94,7 +95,7 @@ public class UsuarioService : IUsuarioService
         if (usuario == null)
         {
             _logger.LogWarning("Usuario no encontrado: {Id}", id);
-            throw new ArgumentException($"Usuario no encontrado con el Id: {id}");
+            throw new NotFoundException($"Usuario no encontrado con el Id: {id}");
         }
         
         return usuario;

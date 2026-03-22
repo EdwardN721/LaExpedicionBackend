@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaExpedicion.Infrastructure.Repository;
 
-public class GenericRepository<T> : IGenericRepository<T> where T 
-    : BaseEntity 
+public class GenericRepository<T> : IGenericRepository<T> where T
+    : BaseEntity
 {
     private readonly AppDbContext _context;
     private readonly DbSet<T> _dbSet;
@@ -20,7 +20,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T
 
     public async Task<T?> ObtenerPorIdAsync(Guid id)
     {
-        return await _dbSet.FindAsync(id); 
+        return await _dbSet.FindAsync(id);
     }
 
     public async Task<IEnumerable<T>> ObtenerTodosAsync()
@@ -28,12 +28,24 @@ public class GenericRepository<T> : IGenericRepository<T> where T
         return await _dbSet.AsNoTracking().ToListAsync();
     }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter,
+        params Expression<Func<T, object>>[] includeProperties)
     {
-        return await _dbSet.AsNoTracking().Where(predicate).ToListAsync(); 
+        IQueryable<T> query = _dbSet.AsNoTracking().Where(filter);
+
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        return await query.ToListAsync();
     }
 
-    public async Task<(IEnumerable<T> Registros, int Total)> ObtenerPaginadosAsync(Expression<Func<T, bool>>? filtro, int pageNumber, int pageSize)
+    public async Task<(IEnumerable<T> Registros, int Total)> ObtenerPaginadosAsync(
+        Expression<Func<T, bool>>? filtro = null,
+        int pageNumber = 1,
+        int pageSize = 10,
+        params Expression<Func<T, object>>[] includeProperties)
     {
         IQueryable<T> query = _dbSet.AsNoTracking();
 
@@ -42,19 +54,32 @@ public class GenericRepository<T> : IGenericRepository<T> where T
             query = query.Where(filtro);
         }
         
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
         int total = await query.CountAsync();
-        
+
         var registros = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-        
+
         return (registros, total);
     }
 
-    public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+    public async Task<T?> GetFirstOrDefaultAsync(Expression<Func<T, bool>> predicate,
+        params Expression<Func<T, object>>[] includeProperties)
     {
-        return await _dbSet.FirstOrDefaultAsync(predicate); 
+        IQueryable<T> query = _dbSet;
+        
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+
+        return await query.FirstOrDefaultAsync(predicate);
     }
 
     public async Task AgregarAsync(T entity)
@@ -74,6 +99,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T
         {
             _dbSet.Attach(entity);
         }
+
         _dbSet.Remove(entity);
     }
 }

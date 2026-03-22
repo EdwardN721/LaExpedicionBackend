@@ -42,8 +42,9 @@ public class EstadisticaService : IEstadisticaService
 
     public async Task<EstadisticaDto> AgregarEstadisticas(CrearEstadisticaDto dto)
     {
-        Estadistica estadistica = dto.MapToEntity(); // Hacerla random
+        Estadistica estadistica = dto.MapToEntity(); 
         await _unitOfWork.Estadisticas.AgregarAsync(estadistica);
+        await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Estadistica agregada: {Id}", estadistica.Id);
         return estadistica.MapToDto();
     }
