@@ -93,7 +93,13 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        // 👇 AQUÍ ESTÁ LA MAGIA: Obligamos a usar JWT como esquema por defecto en toda la app
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -108,6 +114,7 @@ public static class ApplicationServiceExtensions
                     ClockSkew = TimeSpan.Zero
                 };
             });
+        
         return services;
     }
 

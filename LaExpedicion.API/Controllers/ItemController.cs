@@ -4,6 +4,7 @@ using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Shared.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LaExpedicion.API.Controllers;
@@ -11,6 +12,7 @@ namespace LaExpedicion.API.Controllers;
 /// <summary>
 /// Controlador que administra los items
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ItemController : ControllerBase

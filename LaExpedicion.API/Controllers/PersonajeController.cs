@@ -4,6 +4,7 @@ using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Shared.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LaExpedicion.API.Controllers;
@@ -11,6 +12,7 @@ namespace LaExpedicion.API.Controllers;
 /// <summary>
 /// Controlador que administra a los personajes
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class PersonajeController : ControllerBase
@@ -33,13 +35,13 @@ public class PersonajeController : ControllerBase
     public async Task<ActionResult> ObtenerTodosPeronsajes([FromQuery] ItemParameters parameters)
     {
         PagedList<PersonajeDto> pagedResult = await _service.ObtenerTodosPersonajes(parameters);
-        
+
         string metadata = JsonSerializer.Serialize(pagedResult.Metadata);
-        
+
         Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
-        
+
         Response.Headers.Append("X-Pagination", metadata);
-        
+
         return Ok(pagedResult);
     }
 
@@ -59,6 +61,19 @@ public class PersonajeController : ControllerBase
     }
 
     /// <summary>
+    /// Obtener personaje por el Id del Usuario dueño
+    /// </summary>
+    [HttpGet("usuario/{usuarioId:guid}")]
+    [ProducesResponseType(typeof(PersonajeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ObtenerPersonajePorUsuario(Guid usuarioId)
+    {
+        PersonajeDto personaje = await _service.ObtenerPersonajePorUsuarioId(usuarioId);
+        return Ok(personaje);
+    }
+
+
+    /// <summary>
     /// Crear personaje
     /// </summary>
     /// <param name="dto">Información para crear personaje</param>
@@ -70,7 +85,7 @@ public class PersonajeController : ControllerBase
     public async Task<ActionResult> CrearPersonaje([FromBody] CrearPersonajeDto dto)
     {
         PersonajeDto personaje = await _service.CrearPersonaje(dto);
-        return CreatedAtAction(nameof(ObtenerPeronsajePorId), new { id =  personaje.Id }, personaje);   
+        return CreatedAtAction(nameof(ObtenerPeronsajePorId), new { id = personaje.Id }, personaje);
     }
 
     /// <summary>
@@ -88,7 +103,7 @@ public class PersonajeController : ControllerBase
         await _service.ActualizarPersonaje(id, dto);
         return NoContent();
     }
-    
+
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -98,6 +113,4 @@ public class PersonajeController : ControllerBase
         await _service.EliminarPersonaje(id);
         return NoContent();
     }
-    
-    
 }

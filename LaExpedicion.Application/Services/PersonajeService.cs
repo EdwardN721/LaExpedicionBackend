@@ -56,6 +56,12 @@ public class PersonajeService : IPersonajeService
         return personaje.MapToDto();
     }
 
+    public async Task<PersonajeDto> ObtenerPersonajePorUsuarioId(Guid usuarioId)
+    {
+        Personaje peronsaje = await ObtenerPorId(usuarioId);
+        return peronsaje.MapToDto();
+    }
+
     public async Task<PersonajeDto> CrearPersonaje(CrearPersonajeDto dto)
     {
       await _unitOfWork.BeginTransactionAsync();

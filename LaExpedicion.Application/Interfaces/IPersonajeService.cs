@@ -7,8 +7,9 @@ namespace LaExpedicion.Application.Interfaces;
 
 public interface IPersonajeService
 {
-    Task<PagedList<PersonajeDto>> ObtenerTodosPersonajes(ItemParameters Parameters);
+    Task<PagedList<PersonajeDto>> ObtenerTodosPersonajes(ItemParameters parameters);
     Task<PersonajeDto> ObtenerPersonajePorId(Guid id);
+    Task<PersonajeDto> ObtenerPersonajePorUsuarioId(Guid usuarioId);
     Task<PersonajeDto> CrearPersonaje(CrearPersonajeDto dto);
     Task ActualizarPersonaje(Guid id, ActualizarPersonajeDto dto);
     Task EliminarPersonaje(Guid id);
