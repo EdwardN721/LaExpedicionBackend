@@ -4,6 +4,7 @@ using LaExpedicion.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LaExpedicion.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260330014616_AgregarProgresionPersonaje")]
+    partial class AgregarProgresionPersonaje
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -479,11 +482,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<double>("Precio")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("float")
-                        .HasDefaultValue(50.0);
-
                     b.Property<string>("UsuarioCreacion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -506,7 +504,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Hierba Verde",
-                            Precio = 50.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -519,7 +516,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Espada Maestra",
-                            Precio = 10000.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -532,7 +528,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Poción Felix Felicis",
-                            Precio = 25000.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -545,7 +540,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Spray de Primeros Auxilios",
-                            Precio = 150.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -558,7 +552,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Sable de Luz",
-                            Precio = 12000.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -571,7 +564,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "El Anillo Único",
-                            Precio = 50000.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         },
@@ -584,7 +576,6 @@ namespace LaExpedicion.Infrastructure.Migrations
                             FechaCreacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FechaModificacion = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Lanzaredes",
-                            Precio = 1000.0,
                             UsuarioCreacion = "",
                             UsuarioModificacion = ""
                         });

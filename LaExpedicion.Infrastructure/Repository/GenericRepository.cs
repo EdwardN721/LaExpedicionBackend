@@ -62,6 +62,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T
         int total = await query.CountAsync();
 
         var registros = await query
+            .OrderByDescending(x => x.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

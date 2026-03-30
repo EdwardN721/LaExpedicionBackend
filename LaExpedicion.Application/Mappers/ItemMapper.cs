@@ -12,6 +12,7 @@ public static class ItemMapper
         {
             Nombre = dto.Nombre,
             Descripcion = dto.Descripcion ?? "Sin Descripción.",
+            Precio = dto.Precio,
         };
     }
 
@@ -28,6 +29,8 @@ public static class ItemMapper
             Id = item.Id,
             Nombre = item.Nombre,
             Descripcion = item.Descripcion ?? "Sin Descripción.",
+            Precio = item.Precio,
+            ItemModificador = item.ItemModificador.Select(im => im.MapToDto()).ToList()
         };
     }
 

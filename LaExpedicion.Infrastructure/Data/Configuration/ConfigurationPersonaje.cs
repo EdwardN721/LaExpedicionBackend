@@ -21,6 +21,12 @@ public class ConfigurationPersonaje : IEntityTypeConfiguration<Personaje>
             .IsRequired()
             .HasMaxLength(20);
         
+        // Progresion del personaje
+        builder.Property(p => p.Nivel).IsRequired().HasDefaultValue(1);
+        builder.Property(p => p.Experiencia).IsRequired().HasDefaultValue(0);
+        builder.Property(p => p.Dinero).IsRequired().HasDefaultValue(0.0);
+        builder.Property(p => p.SaludActual).IsRequired();
+        
         // Configuracion relaciones
         // Relación 1 a Muchos: Un Usuario (Identity) puede tener Muchos Personajes
         builder.HasOne(p => p.Usuario)

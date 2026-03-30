@@ -23,11 +23,12 @@ public class InventarioService : IInventarioService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<PagedList<InventarioDto>> ObtenerInventarioDelPersonaje(Guid personajeId, InventarioParameters parametros)
+    public async Task<PagedList<InventarioDto>> ObtenerInventarioDelPersonaje(Guid personajeId,
+        InventarioParameters parametros)
     {
         // 1. Filtramos por el personaje obligatorio
         Expression<Func<Inventario, bool>> filter = x => x.PersonajeId == personajeId;
-        
+
         if (!string.IsNullOrWhiteSpace(parametros.Nombre))
         {
             filter = x => x.PersonajeId == personajeId && x.Item!.Nombre.Contains(parametros.Nombre);
@@ -35,13 +36,13 @@ public class InventarioService : IInventarioService
 
         // 2. Le mandamos las tablas que queremos incluir
         var (registros, total) = await _unitOfWork.Inventarios.ObtenerPaginadosAsync(
-            filter, 
+            filter,
             parametros.PageNumber,
             parametros.PageSize,
-            x => x.Item!,       // 👈 Entity Framework hará un INNER JOIN con Items
-            x => x.Personaje!   // 👈 Entity Framework hará un INNER JOIN con Personajes
+            x => x.Item!, // 👈 Entity Framework hará un INNER JOIN con Items
+            x => x.Personaje! // 👈 Entity Framework hará un INNER JOIN con Personajes
         );
-        
+
         List<InventarioDto> inventarios = registros.Select(inventario => inventario.MapToDto()).ToList();
 
         return new PagedList<InventarioDto>(
@@ -55,10 +56,10 @@ public class InventarioService : IInventarioService
     {
         _logger.LogInformation("Agregando item {ItemId} al personaje {PersonajeId}", item.ItemId, item.PersonajeId);
         Inventario nuevoRegistro = item.MapToEntity();
-        
+
         await _unitOfWork.Inventarios.AgregarAsync(nuevoRegistro);
         await _unitOfWork.SaveChangesAsync();
-        
+
         _logger.LogInformation("Item agregado al inventario exitosamente. Id de inventario: {Id}", nuevoRegistro.Id);
         return nuevoRegistro.MapToDto();
     }
@@ -69,11 +70,12 @@ public class InventarioService : IInventarioService
 
         inventario.Equipado = item.Equipado;
         inventario.UsosRestantes = item.UsosRestantes;
-        
+
         _unitOfWork.Inventarios.Actualizar(inventario);
         await _unitOfWork.SaveChangesAsync();
-        
-        _logger.LogInformation("Inventario {Id} actualizado. Equipado: {Equipado}, Usos: {Usos}", id, item.Equipado, item.UsosRestantes);
+
+        _logger.LogInformation("Inventario {Id} actualizado. Equipado: {Equipado}, Usos: {Usos}", id, item.Equipado,
+            item.UsosRestantes);
     }
 
     public async Task EliminarInventario(Guid id)
@@ -81,41 +83,143 @@ public class InventarioService : IInventarioService
         Inventario inventario = await ObtenerPorId(id);
         _unitOfWork.Inventarios.Eliminar(inventario);
         await _unitOfWork.SaveChangesAsync();
-        
+
         _logger.LogInformation("El registro de inventario {Id} fue descartado/eliminado.", id);
     }
 
     public async Task UsarItem(Guid inventarioId, int usoAGastar = 1)
     {
-        Inventario inventario = await ObtenerPorId(inventarioId);
+        // Traemos todo en una sola consulta para poder curar al personaje
+        var inventario = await _unitOfWork.Inventarios.GetFirstOrDefaultAsync(
+            i => i.Id == inventarioId,
+            i => i.Item!,
+            i => i.Personaje!,
+            i => i.Personaje!.Estadistica!
+        ) ?? throw new NotFoundException("Objeto no encontrado en la mochila.");
+
+        if (inventario.UsosRestantes < usoAGastar)
+            throw new Exception("El objeto se ha quedado sin usos.");
+
+        // Lógica de Curación
+        int curacion = 30 * usoAGastar;
+        inventario.Personaje!.SaludActual += curacion;
+
+        // Evitamos overheal (curar más de la salud máxima)
+        if (inventario.Personaje.SaludActual > inventario.Personaje.Estadistica!.Salud)
+        {
+            inventario.Personaje.SaludActual = inventario.Personaje.Estadistica.Salud;
+        }
+
+        // Desgaste del ítem consumible
         inventario.UsosRestantes -= usoAGastar;
 
         if (inventario.UsosRestantes <= 0)
         {
             _unitOfWork.Inventarios.Eliminar(inventario);
-            _logger.LogInformation("El item {Id} se quedó sin usos (se rompió/gastó) y fue removido del inventario.", inventarioId);
+            _logger.LogInformation("El item {Id} se quedó sin usos (se gastó por completo) y fue removido.",
+                inventarioId);
         }
         else
         {
             _unitOfWork.Inventarios.Actualizar(inventario);
-            _logger.LogInformation("Se usó el item {Id}. Usos restantes: {Usos}", inventarioId, inventario.UsosRestantes);
+            _logger.LogInformation("Se usó el item {Id}. Usos restantes: {Usos}", inventarioId,
+                inventario.UsosRestantes);
         }
-        
+
+        _unitOfWork.Personajes.Actualizar(inventario.Personaje);
         await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task EquiparItem(Guid inventarioId)
     {
-        Inventario inventario = await ObtenerPorId(inventarioId);
-        
+        Inventario inventario = await _unitOfWork.Inventarios.ObtenerPorIdAsync(inventarioId)
+                                ?? throw new NotFoundException("Item no encontrado.");
+
         inventario.Equipado = !inventario.Equipado;
-        
+
         _unitOfWork.Inventarios.Actualizar(inventario);
         await _unitOfWork.SaveChangesAsync();
-        
-        _logger.LogInformation("El item del inventario {Id} ahora tiene Equipado = {Estado}", inventarioId, inventario.Equipado);
+
+        _logger.LogInformation("El item del inventario {Id} ahora tiene Equipado = {Estado}", inventarioId,
+            inventario.Equipado);
     }
 
+    public async Task<InventarioDto> ComprarItem(CrearInventarioDto dto) // Usa el mismo DTO, solo cambia la lógica
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            // 1. Traer Personaje e Item
+            var personaje = await _unitOfWork.Personajes.ObtenerPorIdAsync(dto.PersonajeId) 
+                            ?? throw new NotFoundException("Personaje no encontrado.");
+        
+            var item = await _unitOfWork.Items.ObtenerPorIdAsync(dto.ItemId)
+                       ?? throw new NotFoundException("Objeto no encontrado.");
+            
+            // 2. Verificar Fondos
+            if (personaje.Dinero < item.Precio)
+            {
+                throw new Exception($"No tienes suficiente oro. Necesitas {item.Precio} monedas.");
+            }
+            // 3. Cobrar y Guardar en Mochila
+            personaje.Dinero -= item.Precio;
+            _unitOfWork.Personajes.Actualizar(personaje);
+
+            var nuevoInventario = new Inventario
+            {
+                PersonajeId = dto.PersonajeId,
+                ItemId = dto.ItemId,
+                Equipado = false,
+                UsosRestantes = 5 // Si es poción tiene 5 usos, si es arma no importa tanto
+            };
+
+            await _unitOfWork.Inventarios.AgregarAsync(nuevoInventario);
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            return nuevoInventario.MapToDto();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+    
+    public async Task VenderItem(Guid inventarioId)
+    {
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var inventario = await _unitOfWork.Inventarios.GetFirstOrDefaultAsync(
+                i => i.Id == inventarioId, 
+                i => i.Item!, 
+                i => i.Personaje!
+            ) ?? throw new NotFoundException("El objeto no existe en tu mochila.");
+
+            // Las tiendas RPG compran tus objetos usados a mitad de precio
+            double valorDeVenta = inventario.Item!.Precio * 0.5;
+
+            // Le damos el oro al jugador
+            inventario.Personaje!.Dinero += valorDeVenta;
+
+            // Eliminamos el objeto de su mochila
+            _unitOfWork.Inventarios.Eliminar(inventario);
+            _unitOfWork.Personajes.Actualizar(inventario.Personaje);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+            
+            _logger.LogInformation("Personaje {Personaje} vendió {Item} por {Oro} oro.", 
+                inventario.Personaje.NombreUsuario, inventario.Item.Nombre, valorDeVenta);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+    
     #region MetodosPrivados
 
     private async Task<Inventario> ObtenerPorId(Guid id)
@@ -127,7 +231,7 @@ public class InventarioService : IInventarioService
             _logger.LogWarning("No existe ningun Inventario con el Id: {Id}", id);
             throw new NotFoundException($"No exíste el inventario con el Id: {id}");
         }
-        
+
         return inventario;
     }
 

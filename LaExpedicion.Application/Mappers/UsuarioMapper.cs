@@ -40,7 +40,7 @@ public static class UsuarioMapper
         };
     }
 
-    public static IEnumerable<UsuarioDto> MapToDto(this List<Usuario> entities)
+    public static IEnumerable<UsuarioDto> MapToDto(this List<Usuario>? entities)
     {
         return entities?.Select(MapToDto) ?? Enumerable.Empty<UsuarioDto>();
     }

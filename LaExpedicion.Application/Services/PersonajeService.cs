@@ -57,9 +57,20 @@ public class PersonajeService : IPersonajeService
     }
 
     public async Task<PersonajeDto> ObtenerPersonajePorUsuarioId(Guid usuarioId)
-    {
-        Personaje peronsaje = await ObtenerPorId(usuarioId);
-        return peronsaje.MapToDto();
+    { 
+        Personaje? personaje = await _unitOfWork.Personajes.GetFirstOrDefaultAsync(
+            p => p.UsuarioId == usuarioId,
+            p => p.Etiqueta!, // Join
+            p => p.Estadistica! // Join
+        );
+    
+        if (personaje == null)
+        {
+            _logger.LogWarning("El usuario {UsuarioId} no tiene un personaje creado", usuarioId);
+            throw new NotFoundException($"El usuario no tiene ningún personaje activo.");
+        }
+    
+        return personaje.MapToDto();
     }
 
     public async Task<PersonajeDto> CrearPersonaje(CrearPersonajeDto dto)
@@ -69,9 +80,11 @@ public class PersonajeService : IPersonajeService
       try
       {
           Personaje nuevoPersonaje = dto.MapToEntity(); // Se crea sin etiqueta
-
+          
           // Genera estadisticas
           (EstadisticasDto estadisticas, int promedio) = GenerarEstadisticas();
+
+          nuevoPersonaje.SaludActual = estadisticas.Salud;
           
           Guid etiquetaAsignada = Guid.Empty; 
           if (promedio <= 3)

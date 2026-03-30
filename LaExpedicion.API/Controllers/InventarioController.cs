@@ -84,4 +84,34 @@ public class InventarioController : ControllerBase
         await _service.EliminarInventario(id);
         return NoContent();
     }
+    
+    [HttpPost("comprar")]
+    [ProducesResponseType(typeof(InventarioDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> ComprarItem([FromBody] CrearInventarioDto dto)
+    {
+        try
+        {
+            var inventario = await _service.ComprarItem(dto);
+            return Ok(inventario);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
+    }
+    
+    [HttpDelete("{id:guid}/vender")]
+    public async Task<ActionResult> VenderItem(Guid id)
+    {
+        try
+        {
+            await _service.VenderItem(id);
+            return Ok(new { mensaje = "Objeto vendido exitosamente." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
+    }
 }

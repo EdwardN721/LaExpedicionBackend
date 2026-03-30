@@ -11,7 +11,11 @@ public static class PersonajeMapper
         return new Personaje
         {
             NombreUsuario = dto.NombreUsuario,
-            UsuarioId = dto.UsuarioId
+            UsuarioId = dto.UsuarioId,
+            Nivel = 1,
+            Experiencia = 0,
+            Dinero = 0.0,
+            SaludActual = 10
         };
     }
 
@@ -26,7 +30,12 @@ public static class PersonajeMapper
         return new PersonajeDto
         {
             Id = personaje.Id,
+            UsuarioId = personaje.UsuarioId,
             NombreUsuario = personaje.NombreUsuario,
+            Nivel = personaje.Nivel,
+            Experiencia = personaje.Experiencia,
+            Dinero = personaje.Dinero,
+            SaludActual = personaje.SaludActual,
             Etiqueta = personaje.Etiqueta?.Nombre ?? "N/A",
             Salud = personaje.Estadistica?.Salud ?? 0,
             Energia = personaje.Estadistica?.Energia ?? 0,
