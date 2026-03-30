@@ -12,7 +12,6 @@ public static class ExpedicionRealizadaMapper
         {
             PersonajeId = dto.PersonajeId,
             ExpedicionId = dto.ExpedicionId,
-            // Resultado, Dinero y Experiencia se calculan en el Service, no se confía en el DTO de entrada.
         };
     }
 
@@ -23,6 +22,7 @@ public static class ExpedicionRealizadaMapper
             Id = entity.Id,
             PersonajeId = entity.PersonajeId,
             ExpedicionId = entity.ExpedicionId,
+            Nombre = entity.Expedicion?.Nombre ?? "Zona Inexplorada",
             FechaInicio = entity.FechaInicio,
             FechaFin = entity.FechaFin,
             Resultado = entity.Resultado.ToString(),
@@ -31,7 +31,7 @@ public static class ExpedicionRealizadaMapper
         };
     }
 
-    public static IEnumerable<ExpedicionRealizadaDto> MapToDto(this IEnumerable<ExpedicionRealizada> entities)
+    public static IEnumerable<ExpedicionRealizadaDto> MapToDto(this IEnumerable<ExpedicionRealizada>? entities)
     {
         return entities?.Select(MapToDto) ?? Enumerable.Empty<ExpedicionRealizadaDto>();
     }

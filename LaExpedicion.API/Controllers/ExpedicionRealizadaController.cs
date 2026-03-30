@@ -28,16 +28,16 @@ public class ExpedicionRealizadaController : ControllerBase
     /// </summary>
     [HttpGet("{personajeId}/historial")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> ObtenerHistorial(Guid personajeId, [FromQuery] RequestParameters parameters)
+    public async Task<ActionResult> ObtenerHistorial(Guid personajeId, [FromQuery] ExpedicionParameters parameters)
     {
         PagedList<ExpedicionRealizadaDto> pagedResult = await _expedicionRealizadaService.ObtenerHistorialDePersonaje(personajeId, parameters);
         
-        string metadataJson = JsonSerializer.Serialize(pagedResult);
+        var metadataJson = JsonSerializer.Serialize(pagedResult.Metadata);
         
-        // Agregamos la información de paginación en el encabezado (Header) de la respuesta
         Response.Headers.Append("Access-Control-Expose-Headers", "X-Pagination");
+        
         Response.Headers.Append("X-Pagination", metadataJson);
-
+        
         return Ok(pagedResult);
     }
 
