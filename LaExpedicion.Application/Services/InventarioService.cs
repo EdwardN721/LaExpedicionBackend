@@ -5,6 +5,7 @@ using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Mappers;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Domain.Entities;
+using LaExpedicion.Domain.Enum;
 using LaExpedicion.Domain.Exceptions;
 using LaExpedicion.Domain.Interfaces;
 using LaExpedicion.Shared.Pagination;
@@ -40,6 +41,7 @@ public class InventarioService : IInventarioService
             parametros.PageNumber,
             parametros.PageSize,
             x => x.Item!, // 👈 Entity Framework hará un INNER JOIN con Items
+            x => x.Item!.ItemModificador, // Trar los modificadores
             x => x.Personaje! // 👈 Entity Framework hará un INNER JOIN con Personajes
         );
 
@@ -132,52 +134,107 @@ public class InventarioService : IInventarioService
 
     public async Task EquiparItem(Guid inventarioId)
     {
-        Inventario inventario = await _unitOfWork.Inventarios.ObtenerPorIdAsync(inventarioId)
-                                ?? throw new NotFoundException("Item no encontrado.");
+        Inventario inventario = await _unitOfWork.Inventarios.GetFirstOrDefaultAsync(
+            i => i.Id == inventarioId,
+            i => i.Item!
+        ) ?? throw new NotFoundException("Item no encontrado en la mochila.");
 
-        inventario.Equipado = !inventario.Equipado;
+        if (inventario.Equipado)
+        {
+            inventario.Equipado = false;
+            _unitOfWork.Inventarios.Actualizar(inventario);
+            await _unitOfWork.SaveChangesAsync();
+            return;
+        }
 
+        if (inventario.Item!.TipoItem == EnumTipoItems.Consumible)
+        {
+            throw new Exception("No puedes equiparte un objeto consumible. Usa el botón de 'Usar'.");
+        }
+
+        var (equipados, _) = await _unitOfWork.Inventarios.ObtenerPaginadosAsync(
+            i => i.PersonajeId == inventario.PersonajeId && i.Equipado == true,
+            1, 50,
+            i => i.Item!
+        );
+
+        EnumTipoItems tipoNuevo = inventario.Item.TipoItem;
+
+        foreach (var itemEquipado in equipados)
+        {
+            EnumTipoItems tipoEquipado = itemEquipado.Item!.TipoItem;
+
+            if (tipoNuevo == tipoEquipado)
+            {
+                itemEquipado.Equipado = false;
+                _unitOfWork.Inventarios.Actualizar(itemEquipado);
+            }
+            else if ((tipoNuevo == EnumTipoItems.ArmaUnaMano || tipoNuevo == EnumTipoItems.ArmaDosManos) && 
+                     (tipoEquipado == EnumTipoItems.ArmaUnaMano || tipoEquipado == EnumTipoItems.ArmaDosManos))
+            {
+                itemEquipado.Equipado = false;
+                _unitOfWork.Inventarios.Actualizar(itemEquipado);
+            }
+        }
+
+        inventario.Equipado = true;
         _unitOfWork.Inventarios.Actualizar(inventario);
-        await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation("El item del inventario {Id} ahora tiene Equipado = {Estado}", inventarioId,
-            inventario.Equipado);
+        await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<InventarioDto> ComprarItem(CrearInventarioDto dto) // Usa el mismo DTO, solo cambia la lógica
+    public async Task<InventarioDto> ComprarItem(CrearInventarioDto dto)
     {
         await _unitOfWork.BeginTransactionAsync();
         try
         {
-            // 1. Traer Personaje e Item
             var personaje = await _unitOfWork.Personajes.ObtenerPorIdAsync(dto.PersonajeId) 
                             ?? throw new NotFoundException("Personaje no encontrado.");
-        
+            
             var item = await _unitOfWork.Items.ObtenerPorIdAsync(dto.ItemId)
                        ?? throw new NotFoundException("Objeto no encontrado.");
-            
-            // 2. Verificar Fondos
+
             if (personaje.Dinero < item.Precio)
             {
                 throw new Exception($"No tienes suficiente oro. Necesitas {item.Precio} monedas.");
             }
-            // 3. Cobrar y Guardar en Mochila
+
             personaje.Dinero -= item.Precio;
             _unitOfWork.Personajes.Actualizar(personaje);
 
-            var nuevoInventario = new Inventario
-            {
-                PersonajeId = dto.PersonajeId,
-                ItemId = dto.ItemId,
-                Equipado = false,
-                UsosRestantes = 5 // Si es poción tiene 5 usos, si es arma no importa tanto
-            };
+            var inventarioExistente = await _unitOfWork.Inventarios.GetFirstOrDefaultAsync(
+                i => i.PersonajeId == dto.PersonajeId && i.ItemId == dto.ItemId,
+                i => i.Item!,
+                i => i.Personaje!
+            );
 
-            await _unitOfWork.Inventarios.AgregarAsync(nuevoInventario);
+            Inventario inventarioFinal;
+
+            if (inventarioExistente != null)
+            {
+                inventarioExistente.UsosRestantes += 5; 
+                _unitOfWork.Inventarios.Actualizar(inventarioExistente);
+                inventarioFinal = inventarioExistente;
+            }
+            else
+            {
+                inventarioFinal = new Inventario
+                {
+                    PersonajeId = dto.PersonajeId,
+                    ItemId = dto.ItemId,
+                    Equipado = false,
+                    UsosRestantes = 5 
+                };
+                await _unitOfWork.Inventarios.AgregarAsync(inventarioFinal);
+            }
+
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
-            return nuevoInventario.MapToDto();
+            inventarioFinal.Item = item;
+            inventarioFinal.Personaje = personaje;
+
+            return inventarioFinal.MapToDto();
         }
         catch (Exception)
         {
@@ -197,10 +254,8 @@ public class InventarioService : IInventarioService
                 i => i.Personaje!
             ) ?? throw new NotFoundException("El objeto no existe en tu mochila.");
 
-            // Las tiendas RPG compran tus objetos usados a mitad de precio
             double valorDeVenta = inventario.Item!.Precio * 0.5;
 
-            // Le damos el oro al jugador
             inventario.Personaje!.Dinero += valorDeVenta;
 
             // Eliminamos el objeto de su mochila

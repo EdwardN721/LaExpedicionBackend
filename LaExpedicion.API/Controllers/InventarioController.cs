@@ -60,12 +60,17 @@ public class InventarioController : ControllerBase
     }
 
     [HttpPost("{id:guid}/usar")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> UsarItem([FromRoute] Guid id, [FromQuery] int usos = 1)
+    public async Task<ActionResult> UsarItem(Guid id, [FromQuery] int usos = 1)
     {
-        // Mecánica de juego: Gastar pociones o durabilidad del arma
-        await _service.UsarItem(id, usos);
-        return Ok(new { Mensaje = $"Se gastaron {usos} usos del item." });
+        try
+        {
+            await _service.UsarItem(id, usos);
+            return Ok(new { mensaje = "Objeto utilizado y efectos aplicados." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { mensaje = ex.Message });
+        }
     }
 
     [HttpPatch("{id:guid}/equipar")]

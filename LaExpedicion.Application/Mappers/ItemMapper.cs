@@ -30,6 +30,7 @@ public static class ItemMapper
             Nombre = item.Nombre,
             Descripcion = item.Descripcion ?? "Sin Descripción.",
             Precio = item.Precio,
+            TipoItem = item.TipoItem,
             ItemModificador = item.ItemModificador.Select(im => im.MapToDto()).ToList()
         };
     }

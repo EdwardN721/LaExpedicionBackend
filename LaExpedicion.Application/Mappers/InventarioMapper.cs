@@ -27,6 +27,8 @@ public static class InventarioMapper
     {
         return new InventarioDto
         {
+            Id = inventario.Id,
+            ItemId = inventario.ItemId,
             NombrePersonaje = inventario.Personaje?.NombreUsuario ?? "Desconcido.",
             NombreItem = inventario.Item?.Nombre ?? "Desconcido.",
             Equipado = inventario.Equipado,

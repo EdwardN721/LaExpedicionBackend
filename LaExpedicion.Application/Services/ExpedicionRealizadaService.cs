@@ -58,34 +58,46 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
                     "Estás demasiado herido para explorar. Usa pociones desde tu mochila para curarte.");
             }
 
-            // 3. Traer los ítems EQUIPADOS del inventario (con sus modificadores)
+            // 3. Traer los ítems EQUIPADOS del inventario
             var (registrosInventario, _) = await _unitOfWork.Inventarios.ObtenerPaginadosAsync(
                 i => i.PersonajeId == personajeId && i.Equipado == true,
                 1, 50,
-                i => i.Item!,
-                i => i.Item!.ItemModificador
+                i => i.Item!
             );
             var inventarioEquipado = registrosInventario.ToList();
 
-            // 4. LÓGICA DE BATALLA: Base + Nivel + Modificadores
-            int poderTotal = personaje.Estadistica!.Fuerza + personaje.Estadistica.Magia +
-                             personaje.Estadistica.Energia + personaje.Estadistica.Mana;
+            // Variable para guardar el poder de las armas
+            int poderExtraPorEquipo = 0;
 
-            poderTotal += (personaje.Nivel * 5); // Bono de nivel
-
-            // Sumamos los buffs de los items equipados
+            // Calculamos los modificadores sin sobreescribir el objeto rastreado
             foreach (var inv in inventarioEquipado)
             {
-                foreach (var mod in inv.Item!.ItemModificador)
+                var (itemConMods, _) = await _unitOfWork.Items.ObtenerPaginadosAsync(
+                    item => item.Id == inv.ItemId, 
+                    1, 1, 
+                    item => item.ItemModificador!
+                );
+            
+                var mods = itemConMods.FirstOrDefault()?.ItemModificador;
+                if (mods != null)
                 {
-                    // Aquí suma todo el poder extra que te den tus armas/armaduras
-                    poderTotal += mod.ValorAjuste;
+                    foreach (var mod in mods)
+                    {
+                        poderExtraPorEquipo += mod.ValorAjuste;
+                    }
                 }
             }
 
+            // 4. LÓGICA DE BATALLA: Base + Nivel + Equipo
+            int poderTotal = personaje.Estadistica!.Fuerza + personaje.Estadistica.Magia + 
+                             personaje.Estadistica.Energia + personaje.Estadistica.Mana;
+        
+            poderTotal += (personaje.Nivel * 10);
+            poderTotal += poderExtraPorEquipo;
+
             // Dificultad Dinámica vs Suerte
-            int dificultad = (expedicion.Experiencia + (int)expedicion.Dinero) / 2;
-            int tiradaDeDados = Random.Shared.Next(1, 101); // Número del 1 al 100
+            int dificultad = 40 + ((expedicion.Experiencia + (int)expedicion.Dinero) / 20);
+            int tiradaDeDados = Random.Shared.Next(1, 101);
             int puntuacionFinal = tiradaDeDados + poderTotal;
 
             bool esExito = puntuacionFinal >= dificultad;
