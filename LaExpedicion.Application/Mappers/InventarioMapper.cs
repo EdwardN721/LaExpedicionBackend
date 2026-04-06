@@ -33,6 +33,7 @@ public static class InventarioMapper
             NombreItem = inventario.Item?.Nombre ?? "Desconcido.",
             Equipado = inventario.Equipado,
             UsosRestantes = inventario.UsosRestantes,
+            Item = inventario.Item != null ? inventario.Item.MapToDto() : null
         };
     }
 

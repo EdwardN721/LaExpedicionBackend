@@ -1,0 +1,197 @@
+[
+  {
+    "id": "EV_CUEVA_01",
+    "nombre": "La Trampa en la Oscuridad",
+    "narrativa": "Mientras exploras las profundidades de la cueva, pisas una placa de presión. Escuchas el zumbido de un dardo envenenado volando directo hacia tu cuello.",
+    "opciones": [
+      {
+        "idOpcion": "OP_FUERZA",
+        "texto": "Levantar mi arma/escudo con todas mis fuerzas para bloquearlo.",
+        "estadisticaRequerida": "Fuerza",
+        "dificultad": 40,
+        "textoExito": "El dardo choca violentamente contra tu equipo y se hace pedazos. Ganas confianza.",
+        "textoFallo": "El arma era muy pesada para levantarla a tiempo. El dardo te impacta.",
+        "recompensaOro": 0,
+        "recompensaXp": 15,
+        "penalizacionSalud": 20
+      },
+      {
+        "idOpcion": "OP_ENERGIA",
+        "texto": "Dar una voltereta rápida por el suelo para esquivarlo.",
+        "estadisticaRequerida": "Energia",
+        "dificultad": 35,
+        "textoExito": "Ruedas por el suelo con una agilidad impresionante y el dardo pasa de largo.",
+        "textoFallo": "Al intentar rodar, tropiezas con una roca y el dardo te roza el brazo.",
+        "recompensaOro": 10,
+        "recompensaXp": 25,
+        "penalizacionSalud": 15
+      },
+      {
+        "idOpcion": "OP_MAGIA",
+        "texto": "Conjurar un escudo de maná rápido para desviar el proyectil.",
+        "estadisticaRequerida": "Magia",
+        "dificultad": 50,
+        "textoExito": "Un destello azul ilumina la cueva. El dardo se desintegra al tocar tu escudo mágico.",
+        "textoFallo": "Tu escudo parpadea y desaparece antes de tiempo.",
+        "recompensaOro": 0,
+        "recompensaXp": 30,
+        "penalizacionSalud": 25
+      }
+    ]
+  },
+  {
+    "id": "EV_TERROR_01",
+    "nombre": "La Casa Abandonada",
+    "narrativa": "En medio de la noche, encuentras una vieja casa con las ventanas rotas. Un susurro extraño te invita a entrar.",
+    "opciones": [
+      {
+        "idOpcion": "OP_Entrar",
+        "texto": "Decides entrar y explorar la casa embrujada.",
+        "estadisticaRequerida": "Fuerza, Magia",
+        "dificultad": 40,
+        "textoExito": "Descubres un grimorio antiguo que aumenta tu poder. El espíritu te agradece por liberarlo.",
+        "textoFallo": "Las sombras te rodean y absorben tu energía vital. Escapas con el alma debilitada.",
+        "recompensaOro": 0,
+        "recompensaXp": 25,
+        "penalizacionSalud": 20,
+        "itemRecompensa": "Accesorio"
+      },
+      {
+        "idOpcion": "OP_Huir",
+        "texto": "Prefieres no arriesgarte y huyes del lugar.",
+        "estadisticaRequerida": "Energia",
+        "dificultad": 15,
+        "textoExito": "Escapas sin problemas, aunque la sensación de ser observado te acompaña.",
+        "textoFallo": "Tropiezas en la oscuridad y te lastimas al huir.",
+        "recompensaOro": 0,
+        "recompensaXp": 5,
+        "penalizacionSalud": 10,
+        "itemRecompensa": "Ninguno"
+      }
+    ]
+  },
+  {
+    "id": "EV_SCI_FI_01",
+    "nombre": "Luces en el Cielo",
+    "narrativa": "Unas extrañas luces descienden sobre el pueblo. Un dron desconocido flota frente a ti, escaneando tu rostro.",
+    "opciones": [
+      {
+        "idOpcion": "OP_Interactuar",
+        "texto": "Intentas comunicarte con el dron.",
+        "estadisticaRequerida": "Mana, Magia",
+        "dificultad": 45,
+        "textoExito": "El dron reconoce tu señal y te entrega un dispositivo alienígena.",
+        "textoFallo": "El dron te dispara un rayo paralizante antes de desaparecer.",
+        "recompensaOro": 0,
+        "recompensaXp": 35,
+        "penalizacionSalud": 30,
+        "itemRecompensa": "Aleatorio"
+      },
+      {
+        "idOpcion": "OP_Atacar",
+        "texto": "Decides destruirlo antes de que haga daño.",
+        "estadisticaRequerida": "Fuerza, Energia",
+        "dificultad": 50,
+        "textoExito": "Logras derribarlo y obtienes piezas tecnológicas valiosas que puedes vender.",
+        "textoFallo": "El dron explota de cerca y te hiere gravemente.",
+        "recompensaOro": 100,
+        "recompensaXp": 20,
+        "penalizacionSalud": 40,
+        "itemRecompensa": "Ninguno"
+      }
+    ]
+  },
+  {
+    "id": "EV_SUSPENSO_01",
+    "nombre": "El Puente Roto",
+    "narrativa": "Un puente colgante se balancea sobre un abismo. El viento sopla fuerte y escuchas pasos detrás de ti.",
+    "opciones": [
+      {
+        "idOpcion": "OP_Cruzar",
+        "texto": "Intentas cruzar el puente rápidamente.",
+        "estadisticaRequerida": "Energia, Fuerza",
+        "dificultad": 35,
+        "textoExito": "Llegas al otro lado justo antes de que el puente colapse.",
+        "textoFallo": "El puente se rompe y caes, apenas sobrevives escalando por la cuerda.",
+        "recompensaOro": 0,
+        "recompensaXp": 20,
+        "penalizacionSalud": 35,
+        "itemRecompensa": "Ninguno"
+      },
+      {
+        "idOpcion": "OP_Enfrentar",
+        "texto": "Te giras para enfrentar a quien te sigue.",
+        "estadisticaRequerida": "Fuerza",
+        "dificultad": 40,
+        "textoExito": "Era un viajero asustado; lo salvas y se convierte en tu aliado, dándote oro.",
+        "textoFallo": "Era un bandido que te empuja, te ataca y roba tus pertenencias.",
+        "recompensaOro": -30,
+        "recompensaXp": 15,
+        "penalizacionSalud": 20,
+        "itemRecompensa": "Ninguno"
+      }
+    ]
+  },
+  {
+    "id": "EV_COMICO_01",
+    "nombre": "El Pollo Rebelde",
+    "narrativa": "En la plaza del mercado, un pollo gigante escapa de su corral y causa caos entre los aldeanos.",
+    "opciones": [
+      {
+        "idOpcion": "OP_Capturar",
+        "texto": "Intentas atrapar al pollo lanzándote sobre él.",
+        "estadisticaRequerida": "Energia, Fuerza",
+        "dificultad": 25,
+        "textoExito": "Logras capturarlo y los aldeanos te recompensan con provisiones.",
+        "textoFallo": "El pollo te pica la cara y escapa, dejándote humillado frente al pueblo.",
+        "recompensaOro": 20,
+        "recompensaXp": 10,
+        "penalizacionSalud": 5,
+        "itemRecompensa": "Consumible"
+      },
+      {
+        "idOpcion": "OP_Unirte",
+        "texto": "Decides unirte al pollo en su rebelión cacareando fuerte.",
+        "estadisticaRequerida": "Mana, Energia",
+        "dificultad": 30,
+        "textoExito": "El pollo te acepta como su líder espiritual y juntos saquean un puesto de frutas.",
+        "textoFallo": "El pollo te ignora, y los guardias te golpean por alterar el orden público.",
+        "recompensaOro": 0,
+        "recompensaXp": 15,
+        "penalizacionSalud": 10,
+        "itemRecompensa": "Aleatorio"
+      }
+    ]
+  },
+  {
+    "id": "EV_TERROR_02",
+    "nombre": "El Espejo Maldito",
+    "narrativa": "Encuentras un espejo antiguo en una cabaña. Tu reflejo sonríe aunque tú no lo hagas.",
+    "opciones": [
+      {
+        "idOpcion": "OP_Romper",
+        "texto": "Sacas tu arma y decides romper el espejo.",
+        "estadisticaRequerida": "Fuerza, Energia",
+        "dificultad": 35,
+        "textoExito": "El cristal se hace añicos y liberas un espíritu que te deja una reliquia en el suelo.",
+        "textoFallo": "Los pedazos de cristal vuelan hacia ti como cuchillos. Una maldición te debilita.",
+        "recompensaOro": 0,
+        "recompensaXp": 25,
+        "penalizacionSalud": 30,
+        "itemRecompensa": "Accesorio"
+      },
+      {
+        "idOpcion": "OP_Observar",
+        "texto": "Te quedas mirando fijamente el reflejo, canalizando tu mente.",
+        "estadisticaRequerida": "Magia, Mana",
+        "dificultad": 40,
+        "textoExito": "Vences al ente del espejo en un duelo mental. Descubres secretos arcanos.",
+        "textoFallo": "El reflejo te engaña y quedas atrapado en un trance doloroso por horas.",
+        "recompensaOro": 0,
+        "recompensaXp": 30,
+        "penalizacionSalud": 20,
+        "itemRecompensa": "Ninguno"
+      }
+    ]
+  }
+]

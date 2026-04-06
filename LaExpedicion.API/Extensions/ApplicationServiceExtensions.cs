@@ -48,6 +48,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IPersonajeService, PersonajeService>();
         services.AddScoped<IUsuarioService, UsuarioService>();
         services.AddScoped<IExpedicionRealizadaService, ExpedicionRealizadaService>();
+        services.AddScoped<IEventoService, EventoService>();
         
         return services;
     }
