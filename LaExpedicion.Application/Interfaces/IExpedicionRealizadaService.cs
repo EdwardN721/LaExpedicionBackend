@@ -1,3 +1,4 @@
+using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Shared.Pagination;
@@ -13,12 +14,12 @@ public interface IExpedicionRealizadaService
     /// <param name="parameters">Parametros paginado</param>
     /// <returns>Expediciones realizadas</returns>
     Task<PagedList<ExpedicionRealizadaDto>> ObtenerHistorialDePersonaje(Guid personajeId, RequestParameters parameters);
-    
+
     /// <summary>
     /// El personaje comieza con la expedicion
     /// </summary>
-    /// <param name="personajeId">Id del personaje</param>
-    /// <param name="expedicionId">Id de la expedicion</param>
+    /// <param name="dto">Datos para la expedicion realizada</param>
+    /// <param name="usuarioId">Id del usuario que ejecuta la accion</param>
     /// <returns>Expedicion actual</returns>
-    Task<ExpedicionRealizadaDto> EmprenderExpedicion(Guid personajeId, Guid expedicionId);
+    Task<ExpedicionRealizadaDto> EmprenderExpedicion(CrearExpedicionRealizadaDto dto, Guid usuarioId);
 }

@@ -5,6 +5,7 @@ using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Shared.Pagination;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LaExpedicion.API.Controllers;
 
@@ -56,6 +57,7 @@ public class EtiquetaController : ControllerBase
     /// <param name="dto">Información para crear la etiqueta</param>
     /// <returns>Etiqueta creada</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(EtiquetaDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AgregarEtiqueta([FromBody] CrearEtiquetaDto dto)
@@ -70,6 +72,7 @@ public class EtiquetaController : ControllerBase
     /// <param name="id">Id de la etiqueta</param>
     /// <param name="dto">Información para actualizar la etiqueta</param>
     /// <returns>Estado de la actualizacion</returns>
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,6 +83,7 @@ public class EtiquetaController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

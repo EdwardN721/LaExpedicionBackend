@@ -51,6 +51,8 @@ public class UsuarioService : IUsuarioService
             throw new Exception($"El usuario no se agrego correctamente: {errores}");
         }
         
+        await _userManager.AddToRoleAsync(usuario, "Player");
+        
         _logger.LogInformation("Usuario agregado correctamente: {UsuarioNombre}", usuario.Nombre);
         return usuario.MapToDto();
     }

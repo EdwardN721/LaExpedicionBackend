@@ -61,6 +61,7 @@ public class ExpedicionController : ControllerBase
     /// </summary>
     /// <param name="dto">Datos para crear una expedición</param>
     /// <returns>Expedición creada</returns>
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(typeof(ExpedicionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,6 +77,7 @@ public class ExpedicionController : ControllerBase
     /// <param name="id">Id de la expedicion</param>
     /// <param name="dto">Información de la expedicion</param>
     /// <returns>Estado de la actualización</returns>
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -90,6 +92,7 @@ public class ExpedicionController : ControllerBase
     /// </summary>
     /// <param name="id">Id de la expedición</param>
     /// <returns>Estado de la eliminación</returns>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

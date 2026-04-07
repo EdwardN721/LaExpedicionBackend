@@ -1,3 +1,4 @@
+using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Domain.Enum;
 using LaExpedicion.Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ExpedicionRealizadaService> _logger;
-
+    
     public ExpedicionRealizadaService(IUnitOfWork unitOfWork, ILogger<ExpedicionRealizadaService> logger)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -36,7 +37,7 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
         return new PagedList<ExpedicionRealizadaDto>(dtos, total, parameters.PageNumber, parameters.PageSize);
     }
 
-    public async Task<ExpedicionRealizadaDto> EmprenderExpedicion(Guid personajeId, Guid expedicionId)
+    public async Task<ExpedicionRealizadaDto> EmprenderExpedicion(CrearExpedicionRealizadaDto dto, Guid usuarioId)
     {
         await _unitOfWork.BeginTransactionAsync();
 
@@ -44,11 +45,16 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
         {
             // 1. Validar que el personaje y la expedición existen (Y traemos sus estadísticas)
             Personaje personaje = await _unitOfWork.Personajes.GetFirstOrDefaultAsync(
-                p => p.Id == personajeId,
+                p => p.Id == dto.PersonajeId,
                 p => p.Estadistica!
             ) ?? throw new NotFoundException("El personaje no existe.");
 
-            Expedicion expedicion = await _unitOfWork.Expediciones.ObtenerPorIdAsync(expedicionId)
+            if (personaje.UsuarioId != usuarioId)
+            {
+                throw new UnauthorizedAccessException("¡ALERTA DE SEGURIDAD! Estás intentando usar un personaje que no te pertenece.");
+            }
+            
+            Expedicion expedicion = await _unitOfWork.Expediciones.ObtenerPorIdAsync(dto.ExpedicionId)
                                     ?? throw new NotFoundException("La expedición no existe.");
 
             // 2. Prevención de Muerte
@@ -60,7 +66,7 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
 
             // 3. Traer los ítems EQUIPADOS del inventario
             var (registrosInventario, _) = await _unitOfWork.Inventarios.ObtenerPaginadosAsync(
-                i => i.PersonajeId == personajeId && i.Equipado == true,
+                i => i.PersonajeId == dto.PersonajeId && i.Equipado == true,
                 1, 50,
                 i => i.Item!
             );
@@ -73,11 +79,11 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
             foreach (var inv in inventarioEquipado)
             {
                 var (itemConMods, _) = await _unitOfWork.Items.ObtenerPaginadosAsync(
-                    item => item.Id == inv.ItemId, 
-                    1, 1, 
-                    item => item.ItemModificador!
+                    item => item.Id == inv.ItemId,
+                    1, 1,
+                    item => item.ItemModificador
                 );
-            
+
                 var mods = itemConMods.FirstOrDefault()?.ItemModificador;
                 if (mods != null)
                 {
@@ -89,9 +95,9 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
             }
 
             // 4. LÓGICA DE BATALLA: Base + Nivel + Equipo
-            int poderTotal = personaje.Estadistica!.Fuerza + personaje.Estadistica.Magia + 
+            int poderTotal = personaje.Estadistica!.Fuerza + personaje.Estadistica.Magia +
                              personaje.Estadistica.Energia + personaje.Estadistica.Mana;
-        
+
             poderTotal += (personaje.Nivel * 10);
             poderTotal += poderExtraPorEquipo;
 
@@ -157,8 +163,8 @@ public class ExpedicionRealizadaService : IExpedicionRealizadaService
             // 7. Preparar el registro de la expedición
             var registro = new ExpedicionRealizada
             {
-                PersonajeId = personajeId,
-                ExpedicionId = expedicionId,
+                PersonajeId = dto.PersonajeId,
+                ExpedicionId = dto.ExpedicionId,
                 FechaInicio = DateTime.UtcNow,
                 FechaFin = DateTime.UtcNow,
                 Resultado = esExito ? EnumResultado.Exito : EnumResultado.Fracaso,

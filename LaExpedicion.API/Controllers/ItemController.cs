@@ -69,6 +69,7 @@ public class ItemController : ControllerBase
     /// </summary>
     /// <param name="itemDto">Información para crear un Item</param>
     /// <returns>Item Creado</returns>
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(typeof(ItemDto), 201)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -85,6 +86,7 @@ public class ItemController : ControllerBase
     /// <param name="id">Id del iten</param>
     /// <param name="itemDto">Información del Item</param>
     /// <returns>Estado de la actualización</returns>
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,6 +102,7 @@ public class ItemController : ControllerBase
     /// </summary>
     /// <param name="id">Id del Item</param>
     /// <returns>Estado de la elimiación</returns>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

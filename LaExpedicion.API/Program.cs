@@ -1,5 +1,6 @@
 using LaExpedicion.API.Extensions;
 using LaExpedicion.API.Middleware;
+using Microsoft.AspNetCore.Identity;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,9 @@ builder.Services.AddAuthorization();
 // Fluent validator
 builder.Services.AddValidationService();
 
+// Permite leer el Token en las capas inferiores
+builder.Services.AddReadToken();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,4 +60,20 @@ app.MapControllers(); // <-- enrute el tráfico hacia los controladores
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    
+    string[] rolesNuevos = { "Admin", "Player" };
+    
+    foreach (var rol in rolesNuevos)
+    {
+        if (!await roleManager.RoleExistsAsync(rol))
+        {
+            await roleManager.CreateAsync(new IdentityRole<Guid>(rol));
+        }
+    }
+}
+
 app.Run();

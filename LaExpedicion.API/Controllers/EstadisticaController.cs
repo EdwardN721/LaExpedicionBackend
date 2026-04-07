@@ -4,6 +4,7 @@ using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Parameters;
 using LaExpedicion.Shared.Pagination;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LaExpedicion.API.Controllers;
@@ -56,6 +57,7 @@ public class EstadisticaController : ControllerBase
         return Ok(estadistica);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -67,6 +69,7 @@ public class EstadisticaController : ControllerBase
         return NoContent();
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

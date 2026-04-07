@@ -127,4 +127,10 @@ public static class ApplicationServiceExtensions
         
         return services;
     }
+
+    public static IServiceCollection AddReadToken(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+        return services;
+    }
 }

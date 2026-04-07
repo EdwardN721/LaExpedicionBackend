@@ -12,7 +12,7 @@ public class ExceptionMiddleware
     // Es la instrucción para decirle a la petición: "Pásale a lo que sigue".
     private readonly RequestDelegate _next;
 
-    // Inyectamos el Logger para que,en nuestra consola de backend
+    // Inyectamos el Logger para que, en nuestra consola de backend
     // quede registrado el error real.
     private readonly ILogger<ExceptionMiddleware> _logger;
 
@@ -22,21 +22,31 @@ public class ExceptionMiddleware
         _logger = logger;
     }
 
-    // El metodo InvokeAsync es invocado automicaticamente por .NET 
+    // El metodo InvokeAsync es invocado automicaticamente 
     // con cada petición que llega a la API
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            // Intentamos ejecutar el resto del programa (Controladores, Servicios, Base de datos...)
+            // Intenta ejecutar el resto del programa (Controladores, Servicios, Base de datos...)
             await _next(context);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            // Atrapamos el intento de fraude IDOR y devolvemos 403 Forbidden
+            _logger.LogWarning(ex, "Intento de acceso no autorizado detectado (IDOR).");
+            await HandleExceptionAsync(context, ex);
+        }
+        catch (NotFoundException ex)
+        {
+            // Excepción personalizada de No Encontrado (404)
+            _logger.LogWarning(ex, "Elemento no encontrado.");
+            await HandleExceptionAsync(context, ex);
         }
         catch (Exception ex)
         {
-            // Si cualquier línea de código en TODO el proyecto hace un "throw", caerá aquí irremediablemente.
-            _logger.LogError(ex, "Ocurrió un error en la aplicación.");
-
-            // Si atrapamos un error, llamamos a nuestro método privado para crear el JSON de respuesta
+            // Cualquier otro error genérico (500 o 400)
+            _logger.LogError(ex, "Error interno del servidor.");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -67,7 +77,7 @@ public class ExceptionMiddleware
             
             // ERRORES DE SEGURIDAD (Ej. Un usuario intentando entrar a un lugar sin permisos)
             case UnauthorizedAccessException:
-                statusCode = (int)HttpStatusCode.Unauthorized; // HTTP 401
+                statusCode = (int)HttpStatusCode.Forbidden; // HTTP 403
                 message = "No tienes permisos suficientes para realizar esta acción.";
                 break;
 

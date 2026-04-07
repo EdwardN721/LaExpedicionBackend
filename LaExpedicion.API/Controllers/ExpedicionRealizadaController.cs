@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text.Json;
+using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
 using LaExpedicion.Application.Interfaces;
 using LaExpedicion.Application.Parameters;
@@ -49,13 +51,18 @@ public class ExpedicionRealizadaController : ControllerBase
     /// <summary>
     /// Inicia una aventura (Expedición). Calcula estadísticas, RNG, durabilidad de objetos y devuelve un resultado.
     /// </summary>
-    [HttpPost("{personajeId}/{expedicionId}")]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> EmprenderAventura(Guid personajeId, Guid expedicionId)
+    public async Task<ActionResult> EmprenderAventura([FromBody] CrearExpedicionRealizadaDto dto)
     {
+        string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+            return Unauthorized(new { message = "Token inválido." });
+        
         // Llamamos al servicio que contiene toda la lógica de batalla y transacciones
-        var resultado = await _expedicionRealizadaService.EmprenderExpedicion(personajeId, expedicionId);
+        ExpedicionRealizadaDto resultado = await _expedicionRealizadaService.EmprenderExpedicion(dto, usuarioId);
 
         return Ok(resultado);
     }
