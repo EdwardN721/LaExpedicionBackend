@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
@@ -43,6 +44,7 @@ public class InventarioController : ControllerBase
 
     
     [HttpPost("agregar")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(InventarioDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> AgregarItem([FromBody] CrearInventarioDto dto)
@@ -52,10 +54,16 @@ public class InventarioController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> ActualizarInventario([FromRoute] Guid id, [FromBody] ActualizarInventarioDto dto)
     {
-        await _service.ActualizarInventario(id, dto);
+        string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+            return Unauthorized(new { message = "Token inválido." });
+
+        await _service.ActualizarInventario(id, dto, usuarioId);
         return NoContent();
     }
 
@@ -77,7 +85,12 @@ public class InventarioController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> EquiparItem([FromRoute] Guid id)
     {
-        await _service.EquiparItem(id);
+        string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+            return Unauthorized(new { message = "Token inválido." });
+        
+        await _service.EquiparItem(id, usuarioId);
         return Ok(new { Mensaje = "Estado de equipamiento actualizado." });
     }
 
@@ -97,7 +110,12 @@ public class InventarioController : ControllerBase
     {
         try
         {
-            var inventario = await _service.ComprarItem(dto);
+            string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+                return Unauthorized(new { message = "Token inválido." });
+            
+            var inventario = await _service.ComprarItem(dto, usuarioId);
             return Ok(inventario);
         }
         catch (Exception ex)
@@ -111,7 +129,12 @@ public class InventarioController : ControllerBase
     {
         try
         {
-            await _service.VenderItem(id);
+            string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+                return Unauthorized(new { message = "Token inválido." });
+            
+            await _service.VenderItem(id, usuarioId);
             return Ok(new { mensaje = "Objeto vendido exitosamente." });
         }
         catch (Exception ex)

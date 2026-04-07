@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using LaExpedicion.Application.DTOs.Peticion;
 using LaExpedicion.Application.DTOs.Respuesta;
@@ -100,7 +101,12 @@ public class PersonajeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ActualizarPersonaje([FromRoute] Guid id, [FromBody] ActualizarPersonajeDto dto)
     {
-        await _service.ActualizarPersonaje(id, dto);
+        string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+            return Unauthorized(new { message = "Token inválido." });
+        
+        await _service.ActualizarPersonaje(id, dto, usuarioId);
         return NoContent();
     }
 
@@ -110,7 +116,12 @@ public class PersonajeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> EliminarPersonaje([FromRoute] Guid id)
     {
-        await _service.EliminarPersonaje(id);
+        string? userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid usuarioId))
+            return Unauthorized(new { message = "Token inválido." });
+        
+        await _service.EliminarPersonaje(id, usuarioId);
         return NoContent();
     }
 }

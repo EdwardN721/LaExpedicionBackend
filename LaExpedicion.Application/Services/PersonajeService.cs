@@ -133,9 +133,12 @@ public class PersonajeService : IPersonajeService
       }
     }
 
-    public async Task ActualizarPersonaje(Guid id, ActualizarPersonajeDto dto)
+    public async Task ActualizarPersonaje(Guid id, ActualizarPersonajeDto dto, Guid usuarioId)
     {
         Personaje personaje = await ObtenerPorId(id);
+        
+        ValidarUsuarioReal(personaje.Id, usuarioId);
+        
         personaje.UpdateEntity(dto);
         
         _unitOfWork.Personajes.Actualizar(personaje);
@@ -143,9 +146,11 @@ public class PersonajeService : IPersonajeService
         _logger.LogInformation("Actualizando personaje {NombreUsuario}", dto.NombreUsuario);
     }
 
-    public async Task EliminarPersonaje(Guid id)
+    public async Task EliminarPersonaje(Guid id, Guid usuarioId)
     {
         Personaje personaje = await ObtenerPorId(id);
+        
+        ValidarUsuarioReal(personaje.Id, usuarioId);
         
         _unitOfWork.Personajes.Eliminar(personaje);
         await _unitOfWork.SaveChangesAsync();
@@ -189,6 +194,12 @@ public class PersonajeService : IPersonajeService
             Mana = mana,
             Fuerza = fuerza,
         },  avg);
+    }
+
+    private void ValidarUsuarioReal(Guid personajeId, Guid usuarioId)
+    {
+        if (personajeId != usuarioId)
+            throw new UnauthorizedAccessException("¡ALERTA DE SEGURIDAD! Estás intentando usar un personaje que no te pertenece.");
     }
     
     #endregion

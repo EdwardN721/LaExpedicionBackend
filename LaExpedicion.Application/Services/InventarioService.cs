@@ -66,10 +66,12 @@ public class InventarioService : IInventarioService
         return nuevoRegistro.MapToDto();
     }
 
-    public async Task ActualizarInventario(Guid id, ActualizarInventarioDto item)
+    public async Task ActualizarInventario(Guid id, ActualizarInventarioDto item, Guid usuarioId)
     {
         Inventario inventario = await ObtenerPorId(id);
 
+        ValidarUsuarioReal(inventario.PersonajeId, usuarioId);
+        
         inventario.Equipado = item.Equipado;
         inventario.UsosRestantes = item.UsosRestantes;
 
@@ -98,7 +100,7 @@ public class InventarioService : IInventarioService
             i => i.Personaje!,
             i => i.Personaje!.Estadistica!
         ) ?? throw new NotFoundException("Objeto no encontrado en la mochila.");
-
+        
         if (inventario.UsosRestantes < usoAGastar)
             throw new Exception("El objeto se ha quedado sin usos.");
 
@@ -132,13 +134,15 @@ public class InventarioService : IInventarioService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task EquiparItem(Guid inventarioId)
+    public async Task EquiparItem(Guid inventarioId, Guid usuarioId)
     {
         Inventario inventario = await _unitOfWork.Inventarios.GetFirstOrDefaultAsync(
             i => i.Id == inventarioId,
             i => i.Item!
         ) ?? throw new NotFoundException("Item no encontrado en la mochila.");
 
+        ValidarUsuarioReal(inventario.PersonajeId, usuarioId);
+        
         if (inventario.Equipado)
         {
             inventario.Equipado = false;
@@ -183,13 +187,15 @@ public class InventarioService : IInventarioService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<InventarioDto> ComprarItem(CrearInventarioDto dto)
+    public async Task<InventarioDto> ComprarItem(CrearInventarioDto dto, Guid usuarioId)
     {
         await _unitOfWork.BeginTransactionAsync();
         try
         {
             var personaje = await _unitOfWork.Personajes.ObtenerPorIdAsync(dto.PersonajeId) 
                             ?? throw new NotFoundException("Personaje no encontrado.");
+            
+            ValidarUsuarioReal(personaje.UsuarioId, usuarioId);
             
             var item = await _unitOfWork.Items.ObtenerPorIdAsync(dto.ItemId)
                        ?? throw new NotFoundException("Objeto no encontrado.");
@@ -243,7 +249,7 @@ public class InventarioService : IInventarioService
         }
     }
     
-    public async Task VenderItem(Guid inventarioId)
+    public async Task VenderItem(Guid inventarioId, Guid usuarioId)
     {
         await _unitOfWork.BeginTransactionAsync();
         try
@@ -254,6 +260,8 @@ public class InventarioService : IInventarioService
                 i => i.Personaje!
             ) ?? throw new NotFoundException("El objeto no existe en tu mochila.");
 
+            ValidarUsuarioReal(inventario.PersonajeId, usuarioId);
+            
             double valorDeVenta = inventario.Item!.Precio * 0.5;
 
             inventario.Personaje!.Dinero += valorDeVenta;
@@ -289,6 +297,14 @@ public class InventarioService : IInventarioService
 
         return inventario;
     }
+
+    private void ValidarUsuarioReal(Guid personajeId, Guid usuarioId)
+    {
+        if (personajeId != usuarioId)
+        {
+            throw new UnauthorizedAccessException("¡ALERTA DE SEGURIDAD! Estás intentando usar un personaje que no te pertenece.");
+        }
+    } 
 
     #endregion
 }

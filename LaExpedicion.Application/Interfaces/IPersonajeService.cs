@@ -11,6 +11,6 @@ public interface IPersonajeService
     Task<PersonajeDto> ObtenerPersonajePorId(Guid id);
     Task<PersonajeDto> ObtenerPersonajePorUsuarioId(Guid usuarioId);
     Task<PersonajeDto> CrearPersonaje(CrearPersonajeDto dto);
-    Task ActualizarPersonaje(Guid id, ActualizarPersonajeDto dto);
-    Task EliminarPersonaje(Guid id);
+    Task ActualizarPersonaje(Guid id, ActualizarPersonajeDto dto, Guid usuarioId);
+    Task EliminarPersonaje(Guid id, Guid usuarioId);
 }
