@@ -74,7 +74,7 @@ public class ItemController : ControllerBase
     [ProducesResponseType(typeof(ItemDto), 201)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CrearItem([FromBody] CrearItemDto itemDto)
+    public async Task<IActionResult> CrearItem([FromForm] CrearItemDto itemDto)
     {
         ItemDto item = await _service.CrearItem(itemDto);
         return CreatedAtAction(nameof(ObtenerItem), new { id = item.Id }, item);
@@ -91,7 +91,7 @@ public class ItemController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> ActualizarItem([FromRoute] Guid id, [FromBody] ActualizarItemDto itemDto)
+    public async Task<IActionResult> ActualizarItem([FromRoute] Guid id, [FromForm] ActualizarItemDto itemDto)
     {
         await _service.ModificarItem(id, itemDto);
         return NoContent();

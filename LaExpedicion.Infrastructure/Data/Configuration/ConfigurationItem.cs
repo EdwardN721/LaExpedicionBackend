@@ -24,6 +24,10 @@ public class ConfigurationItem : IEntityTypeConfiguration<Item>
         
         builder.Property(e => e.Descripcion)
             .HasMaxLength(200);
+
+        builder.Property(e => e.ImagenUrl)
+            .IsRequired(false)
+            .HasMaxLength(500);
         
         builder.Property(i => i.Precio)
             .IsRequired()

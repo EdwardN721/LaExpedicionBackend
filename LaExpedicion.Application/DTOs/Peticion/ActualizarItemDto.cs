@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace LaExpedicion.Application.DTOs.Peticion;
 
 public class ActualizarItemDto
@@ -5,5 +7,6 @@ public class ActualizarItemDto
     public Guid Id { get; init; }
     public string Nombre { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
-    public double Precio { get; set; }
+    public double Precio { get; init; }
+    public IFormFile? Imagen { get; init; }
 }

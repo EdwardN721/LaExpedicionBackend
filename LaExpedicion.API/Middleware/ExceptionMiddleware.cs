@@ -78,7 +78,7 @@ public class ExceptionMiddleware
             // ERRORES DE SEGURIDAD (Ej. Un usuario intentando entrar a un lugar sin permisos)
             case UnauthorizedAccessException:
                 statusCode = (int)HttpStatusCode.Forbidden; // HTTP 403
-                message = "No tienes permisos suficientes para realizar esta acción.";
+                message = exception.Message;
                 break;
 
             // ERRORES DE BASE DE DATOS (Entity Framework Core)

@@ -16,11 +16,14 @@ public class ItemService : IItemService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ItemService> _logger;
+    private readonly IBlobStorageService _blobStorageService;
 
-    public ItemService(IUnitOfWork unitOfWork, ILogger<ItemService> logger)
+    public ItemService(IUnitOfWork unitOfWork, ILogger<ItemService> logger,
+        IBlobStorageService blobStorageService)
     {
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
     }
 
     public async Task<PagedList<ItemDto>> ObtenerTodosItems(ItemParameters itemParameters)
@@ -56,6 +59,7 @@ public class ItemService : IItemService
     public async Task<ItemDto> CrearItem(CrearItemDto item)
     {
         _logger.LogInformation("Creando nuevo item: {NombreItem}", item.Nombre);
+        string? urlImagenFinal = null;
         await _unitOfWork.BeginTransactionAsync();
         try
         {
@@ -82,6 +86,11 @@ public class ItemService : IItemService
                 nuevoItem.ItemModificador = modificadoresEnMemoria;
             }
 
+            if (item.Imagen != null)
+            {
+                urlImagenFinal = await _blobStorageService.SubirArchivo(item.Imagen, $"item-{item.Imagen.Name}");
+            }
+            nuevoItem.ImagenUrl = urlImagenFinal;
             await _unitOfWork.CommitTransactionAsync();
             _logger.LogInformation("Item y sus modificadores creados exitosamente con Id: {Id}", nuevoItem.Id);
 
@@ -97,9 +106,17 @@ public class ItemService : IItemService
 
     public async Task ModificarItem(Guid id, ActualizarItemDto itemDto)
     {
+        string? urlImagenFinal = null;
+
         Item item = await ObtenerPorId(id);
 
         item.UpdateEntity(itemDto);
+        
+        if (itemDto.Imagen != null)
+        {
+            urlImagenFinal = await _blobStorageService.SubirArchivo(itemDto.Imagen, $"item-{itemDto.Imagen.Name}");
+        }
+        item.ImagenUrl = urlImagenFinal;
 
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Item modificado correctamente con Id: {Id}", id);

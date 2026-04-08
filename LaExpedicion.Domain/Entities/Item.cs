@@ -9,6 +9,7 @@ public class Item : BaseEntity
     public double Precio { get; set; }
     
     public EnumTipoItems TipoItem { get; set; }
+    public string? ImagenUrl { get; set; } = string.Empty;
     
     public virtual ICollection<ItemModificador> ItemModificador { get; set; } = new HashSet<ItemModificador>();
     public virtual ICollection<Inventario> Inventario { get; set; } = new HashSet<Inventario>();
