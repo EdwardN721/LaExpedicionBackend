@@ -18,7 +18,7 @@ public class BlobStorageService : IBlobStorageService
         _blobServiceClient = new BlobServiceClient(connectionString);
     }
 
-    public async Task<string> SubirArchivo(IFormFile? file, string nombreCarpeta)
+    public async Task<string> SubirArchivo(IFormFile? file, string nombreCarpeta, string nombreArchivo)
     {
         if (file == null || file.Length == 0)
             throw new ArgumentException("El archivo está vacío.");
@@ -30,7 +30,8 @@ public class BlobStorageService : IBlobStorageService
         
         // 2. Generamos un nombre único para el archivo
         string extension = Path.GetExtension(file.FileName);
-        string nombreArchivoFinal = $"{nombreCarpeta}/{Guid.NewGuid()}{extension}";
+        
+        string nombreArchivoFinal = $"{nombreCarpeta}/{nombreArchivo}-{Guid.NewGuid()}{extension}";
         
         // Usamos BlockBlobClient para chunks
         BlockBlobClient blockBlobClient = containerClient.GetBlockBlobClient(nombreArchivoFinal);

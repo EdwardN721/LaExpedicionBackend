@@ -4,5 +4,5 @@ namespace LaExpedicion.Application.Interfaces;
 
 public interface IBlobStorageService
 {
-    Task<string> SubirArchivo(IFormFile? file, string nombreCarpeta);
+    Task<string> SubirArchivo(IFormFile? file, string nombreCarpeta, string nombreArchivo);
 }

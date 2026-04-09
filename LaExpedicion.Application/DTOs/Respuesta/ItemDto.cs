@@ -9,5 +9,7 @@ public record ItemDto
     public Domain.Enum.EnumTipoItems TipoItem { get; init; }
     public string? EstadisticaAfectada { get; init; } = string.Empty;
     public int? ValorAjuste { get; init; }
+    public bool Activo { get; set; }
+    public string ImagenUrl { get; init; } = string.Empty;
     public IEnumerable<ItemModificadorDto> ItemModificador { get; init; } = new List<ItemModificadorDto>();
 };

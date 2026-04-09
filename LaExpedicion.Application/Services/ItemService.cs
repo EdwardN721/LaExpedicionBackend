@@ -88,7 +88,9 @@ public class ItemService : IItemService
 
             if (item.Imagen != null)
             {
-                urlImagenFinal = await _blobStorageService.SubirArchivo(item.Imagen, $"item-{item.Imagen.Name}");
+                string nombreSeguro = item.Nombre.ToLower().Trim().Replace(" ", "-");
+                nombreSeguro = System.Text.RegularExpressions.Regex.Replace(nombreSeguro, @"[^a-z0-9\-]", ""); // Evita problemas en acentos
+                urlImagenFinal = await _blobStorageService.SubirArchivo(item.Imagen, "item-imagenes", nombreSeguro);
             }
             nuevoItem.ImagenUrl = urlImagenFinal;
             await _unitOfWork.CommitTransactionAsync();
@@ -114,7 +116,9 @@ public class ItemService : IItemService
         
         if (itemDto.Imagen != null)
         {
-            urlImagenFinal = await _blobStorageService.SubirArchivo(itemDto.Imagen, $"item-{itemDto.Imagen.Name}");
+            string nombreSeguro = item.Nombre.ToLower().Trim().Replace(" ", "-");
+            nombreSeguro = System.Text.RegularExpressions.Regex.Replace(nombreSeguro, @"[^a-z0-9\-]", ""); // Evita problemas en acentos
+            urlImagenFinal = await _blobStorageService.SubirArchivo(itemDto.Imagen, "item-imagenes", nombreSeguro);
         }
         item.ImagenUrl = urlImagenFinal;
 
