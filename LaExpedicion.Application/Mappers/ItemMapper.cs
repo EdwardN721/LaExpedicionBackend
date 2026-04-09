@@ -9,28 +9,13 @@ public static class ItemMapper
 {
     public static Item MapToEntity(this CrearItemDto dto)
     {
-        var item = new Item
+        return new Item
         {
             Nombre = dto.Nombre,
             Descripcion = dto.Descripcion ?? "Sin Descripción.",
             Precio = dto.Precio,
             TipoItem = (EnumTipoItems)dto.TipoItem,
-            ItemModificador = new List<ItemModificador>() 
         };
-        
-        if (dto.Modificadores != null && dto.Modificadores.Any())
-        {
-            foreach (var mod in dto.Modificadores)
-            {
-                item.ItemModificador.Add(new ItemModificador
-                {
-                    EstadisticaAfectada = mod.EstadisticaAfectada, 
-                    ValorAjuste = mod.ValorAjustado
-                });
-            }
-        }
-
-        return item;
     }
 
     public static void UpdateEntity(this Item entity, ActualizarItemDto dto)
