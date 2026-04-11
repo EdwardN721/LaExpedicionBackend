@@ -113,7 +113,8 @@ public static class ApplicationServiceExtensions
                     ValidateAudience = true,
                     ValidAudience = configuration["Jwt:Audience"],
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    RoleClaimType = "role"
                 };
             });
         

@@ -1,9 +1,11 @@
 namespace LaExpedicion.Shared.Pagination;
 
-public class PagedList<T> : List<T>
+public class PagedList<T> 
 {
     public Metadata Metadata { get; set; }
 
+    public List<T> Data { get; set; }
+    
     public PagedList(List<T> items, int count,
         int pageNumber, int pageSize)
     {
@@ -14,6 +16,7 @@ public class PagedList<T> : List<T>
             CurrentPage = pageNumber,
             TotalPages = (int)Math.Ceiling(count / (double)pageSize)
         };
-        AddRange(items);
+        
+        Data = items;
     }
 }

@@ -13,8 +13,8 @@ namespace LaExpedicion.API.Controllers;
 /// <summary>
 /// Controlador que administra a los personajes
 /// </summary>
-[Authorize]
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class PersonajeController : ControllerBase
 {
@@ -30,6 +30,7 @@ public class PersonajeController : ControllerBase
     /// </summary>
     /// <returns>Listado de personajes</returns>
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IEnumerable<PersonajeDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -52,6 +53,7 @@ public class PersonajeController : ControllerBase
     /// <param name="id">Id del personaje</param>
     /// <returns>Personaje</returns>
     [HttpGet("{id}")]
+    [Authorize(Roles = "Player")]
     [ProducesResponseType(typeof(PersonajeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -65,6 +67,7 @@ public class PersonajeController : ControllerBase
     /// Obtener personaje por el Id del Usuario dueño
     /// </summary>
     [HttpGet("usuario/{usuarioId:guid}")]
+    [Authorize(Roles = "Player")]
     [ProducesResponseType(typeof(PersonajeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> ObtenerPersonajePorUsuario(Guid usuarioId)

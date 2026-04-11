@@ -13,8 +13,8 @@ namespace LaExpedicion.API.Controllers;
 /// <summary>
 /// Controlador que administra el inventario
 /// </summary>
-[Authorize]
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class InventarioController : ControllerBase
 {
@@ -29,6 +29,7 @@ public class InventarioController : ControllerBase
     /// Obtiene todos los objetos en la mochila de un personaje específico
     /// </summary>
     [HttpGet("personaje/{personajeId:guid}")]
+    [Authorize(Roles = "Player")]
     [ProducesResponseType(typeof(PagedList<InventarioDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult> ObtenerInventario([FromRoute] Guid personajeId, [FromQuery] InventarioParameters parameters)
     {
@@ -68,6 +69,7 @@ public class InventarioController : ControllerBase
     }
 
     [HttpPost("{id:guid}/usar")]
+    [Authorize(Roles = "Player")]
     public async Task<ActionResult> UsarItem(Guid id, [FromQuery] int usos = 1)
     {
         try
@@ -82,6 +84,7 @@ public class InventarioController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/equipar")]
+    [Authorize(Roles = "Player")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> EquiparItem([FromRoute] Guid id)
     {
@@ -104,6 +107,7 @@ public class InventarioController : ControllerBase
     }
     
     [HttpPost("comprar")]
+    [Authorize(Roles = "Player")]
     [ProducesResponseType(typeof(InventarioDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> ComprarItem([FromBody] CrearInventarioDto dto)
@@ -125,6 +129,7 @@ public class InventarioController : ControllerBase
     }
     
     [HttpDelete("{id:guid}/vender")]
+    [Authorize(Roles = "Player")]
     public async Task<ActionResult> VenderItem(Guid id)
     {
         try
