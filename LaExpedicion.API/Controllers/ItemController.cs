@@ -30,7 +30,7 @@ public class ItemController : ControllerBase
     /// <param name="itemParameters">Parametros para paginar</param>
     /// <returns>Lista de items</returns>
     [HttpGet]
-    [Authorize(Roles = "Player")]
+    [Authorize(Roles = "Player, Admin")]
     [ProducesResponseType(typeof(List<ItemDto>), 200)]
     public async Task<IActionResult> ObtenerTodosItems([FromQuery] ItemParameters itemParameters)
     {
@@ -57,7 +57,7 @@ public class ItemController : ControllerBase
     /// <param name="id">Id del Item</param>
     /// <returns>Item</returns>
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Player")]
+    [Authorize(Roles = "Player, Admin")]
     [ProducesResponseType(typeof(ItemDto), 200)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObtenerItem([FromRoute] Guid id)

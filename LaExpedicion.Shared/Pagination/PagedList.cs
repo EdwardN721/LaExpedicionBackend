@@ -3,7 +3,6 @@ namespace LaExpedicion.Shared.Pagination;
 public class PagedList<T> 
 {
     public Metadata Metadata { get; set; }
-
     public List<T> Data { get; set; }
     
     public PagedList(List<T> items, int count,
